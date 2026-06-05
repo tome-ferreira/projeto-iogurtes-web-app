@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área de Cliente | Aplicação</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+</head>
+<body class="bg-base-100 min-h-screen">
+    <!-- Navbar -->
+    <div class="navbar bg-primary text-primary-content">
+        <div class="flex-1">
+            <a href="/client-area" class="btn btn-ghost text-xl">Meu Dashboard</a>
+        </div>
+        <div class="flex-none">
+            <ul class="menu menu-horizontal px-1">
+                <li><a href="#">Perfil</a></li>
+                <li><a href="#">Definições</a></li>
+                <li>
+                    <a href="/" class="btn btn-error btn-sm ml-2 mt-1 border-none hover:bg-error/80">Sair</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-8">
+        <h1 class="text-3xl font-bold mb-6">Bem-vindo à Área de Cliente</h1>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="card bg-base-200 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title">Estatísticas</h2>
+                    <p>Aqui você pode ver o resumo das suas atividades.</p>
+                </div>
+            </div>
+            <div class="card bg-base-200 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title">Mensagens</h2>
+                    <p>Você tem 0 novas mensagens.</p>
+                </div>
+            </div>
+            <div class="card bg-base-200 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title">Documentos</h2>
+                    <p>Aceda aos seus ficheiros e faturas recentes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
