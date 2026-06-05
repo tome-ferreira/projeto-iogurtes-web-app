@@ -1,0 +1,22 @@
+/* src/main/resources/static/css/dashboard.css */
+
+/* Customizações adicionais para a Área de Cliente que o Tailwind não cobre nativamente */
+
+/* Custom scrollbar para uma experiência mais limpa */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f8fafc; /* slate-50 */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1; /* slate-300 */
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; /* slate-400 */
+}

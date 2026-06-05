@@ -27,4 +27,9 @@ public class WebController {
     public String clientArea() {
         return "client-area";
     }
+
+    @GetMapping("/encomendas")
+    public String encomendas() {
+        return "encomendas";
+    }
 }

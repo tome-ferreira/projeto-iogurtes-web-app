@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(title='Encomendas | Área B2B', activePage='encomendas', content=~{::#main-content})}">
+<body>
+    <div id="main-content">
+        <div class="space-y-8">
+            <!-- Header Secção -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Histórico e Gestão de Encomendas</h1>
+                    <p class="text-slate-500 mt-1">Acompanhe o estado dos seus pedidos, guias de remessa e faturas.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button class="btn bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm">
+                        <i class="fa-solid fa-filter"></i> Filtrar
+                    </button>
+                    <button class="btn bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm">
+                        <i class="fa-solid fa-file-export"></i> Exportar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card Tabela de Encomendas (Placeholder) -->
+            <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+                <!-- Toolbar da Tabela -->
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800">Todos os Pedidos</h3>
+                    <div class="text-sm text-slate-500 font-medium">0 resultados</div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="table w-full">
+                        <!-- head -->
+                        <thead class="bg-slate-50/80 text-slate-500 font-semibold text-sm">
+                            <tr>
+                                <th class="uppercase tracking-wider">Referência</th>
+                                <th class="uppercase tracking-wider">Data de Pedido</th>
+                                <th class="uppercase tracking-wider">Estado</th>
+                                <th class="uppercase tracking-wider text-right">Total (s/ IVA)</th>
+                                <th class="uppercase tracking-wider text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Estado Vazio -->
+                            <tr>
+                                <td colspan="5" class="py-20 text-center">
+                                    <div class="flex flex-col items-center justify-center text-slate-400">
+                                        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                                            <i class="fa-solid fa-box-open fa-2x text-slate-300"></i>
+                                        </div>
+                                        <p class="font-bold text-slate-600 text-lg">Ainda não efetuou nenhuma encomenda.</p>
+                                        <p class="text-sm mt-2 max-w-sm text-slate-400">
+                                            A tabela de pedidos futuros, bem como o estado de expedição e atalhos para faturas, ficarão listados aqui.
+                                        </p>
+                                        <a th:href="@{/catalogo}" class="btn btn-primary bg-blue-700 hover:bg-blue-800 text-white border-none mt-6 shadow-md">
+                                            Criar Primeira Encomenda
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</body>
+</html>
