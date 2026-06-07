@@ -11,10 +11,10 @@ public class SessionService {
 
     // ── MOCK — substitui pelo login real depois ──────────────────
     private static final SessionUser MOCK_USER = new SessionUser(
-        "550830fa-e7c3-4e89-af34-9829bdd1349d",
-        "António Silva",
-        "antonio.silva@empresa.com",
-        "ADMIN"
+        UUID.fromString("d8186030-e499-4790-ba2e-8c19567ca229"),
+        "Pedro Santos",
+        "pedro.santos@empresa.com",
+        "CLIENTE"
     );
 
     /**
