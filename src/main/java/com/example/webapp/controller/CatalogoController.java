@@ -1,9 +1,7 @@
 package com.example.webapp.controller;
 
 import com.example.webapp.model.PaginatedResponse;
-import com.example.webapp.model.catalogo.PalletTipoResponse;
 import com.example.webapp.model.catalogo.ProdutoCatalogoResponse;
-import com.example.webapp.service.PalletTipoService;
 import com.example.webapp.service.ProdutoCatalogoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,16 +17,18 @@ import java.util.List;
  * Controller Spring MVC para a página de catálogo de produtos.
  *
  * <p>Renderiza o template {@code catalogo.html} com dados paginados de produtos
- * e tipos de pallet obtidos da API REST do backend.</p>
+ * obtidos da API REST do backend.</p>
  *
  * <h3>Fluxo</h3>
  * <ol>
  *   <li>Recebe os parâmetros {@code page} e {@code size} do URL query string.</li>
  *   <li>Chama {@link ProdutoCatalogoService} para obter a página de produtos.</li>
- *   <li>Chama {@link PalletTipoService} para obter todos os tipos de pallet.</li>
  *   <li>Adiciona tudo ao {@link Model} e devolve o nome do template.</li>
  *   <li>Em caso de erro de API, adiciona resposta vazia e mensagem de erro ao modelo.</li>
  * </ol>
+ *
+ * <p>Os tipos de pallet são carregados no {@link ProdutoDetalheController},
+ * não aqui — o catálogo apenas lista produtos e aponta para a página de detalhe.</p>
  */
 @Controller
 public class CatalogoController {
@@ -40,9 +40,6 @@ public class CatalogoController {
 
     @Autowired
     private ProdutoCatalogoService produtoCatalogoService;
-
-    @Autowired
-    private PalletTipoService palletTipoService;
 
     /**
      * Renderiza a página de catálogo com a lista paginada de produtos.
@@ -58,7 +55,7 @@ public class CatalogoController {
             @RequestParam(defaultValue = "10") int size,
             Model model
     ) {
-        // ── 1. Buscar produtos do catálogo ────────────────────────────────────
+        // ── Buscar produtos do catálogo ───────────────────────────────────────
         PaginatedResponse<ProdutoCatalogoResponse> produtos;
         try {
             produtos = produtoCatalogoService.getCatalogo(page, size);
@@ -69,21 +66,11 @@ public class CatalogoController {
                     "Não foi possível carregar o catálogo neste momento. Por favor, tente mais tarde.");
         }
 
-        // ── 2. Buscar tipos de pallet (página grande para obter todos) ────────
-        PaginatedResponse<PalletTipoResponse> palletTipos;
-        try {
-            palletTipos = palletTipoService.getAll(0, 200, "nome", "asc");
-        } catch (PalletTipoService.PalletTipoException e) {
-            log.warn("Falha ao carregar tipos de pallet: {}", e.getMessage());
-            palletTipos = PalletTipoService.emptyResponse();
-        }
-
-        // ── 3. Popular o modelo ───────────────────────────────────────────────
-        model.addAttribute("produtos",         produtos);
-        model.addAttribute("palletTipos",      palletTipos);
-        model.addAttribute("currentPage",      page);
-        model.addAttribute("pageSize",         size);
-        model.addAttribute("pageSizeOptions",  PAGE_SIZE_OPTIONS);
+        // ── Popular o modelo ──────────────────────────────────────────────────
+        model.addAttribute("produtos",        produtos);
+        model.addAttribute("currentPage",     page);
+        model.addAttribute("pageSize",        size);
+        model.addAttribute("pageSizeOptions", PAGE_SIZE_OPTIONS);
 
         return "catalogo";
     }

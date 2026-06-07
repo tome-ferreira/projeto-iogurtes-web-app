@@ -101,13 +101,12 @@
                                           th:text="${produto.precoPorKg != null ? #numbers.formatDecimal(produto.precoPorKg, 1, 2) + ' €' : '—'}">—</span>
                                 </td>
 
-                                <!-- Botão Detalhes -->
+                                <!-- Link para página de detalhe -->
                                 <td class="text-center">
-                                    <button type="button"
-                                            th:data-modal-id="|modal-${produto.id}|"
-                                            class="btn-detalhes btn btn-sm bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 hover:border-blue-200 font-semibold shadow-none">
+                                    <a th:href="@{/produto/{id}(id=${produto.id})}"
+                                       class="btn btn-sm bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 hover:border-blue-200 font-semibold shadow-none">
                                         <i class="fa-solid fa-eye mr-1"></i> Detalhes
-                                    </button>
+                                    </a>
                                 </td>
                             </tr>
 
@@ -156,132 +155,7 @@
                 </div>
             </div>
 
-            <!-- ══ MODAIS DE DETALHES (um por produto) ═══════════════════════ -->
-            <th:block th:each="produto : ${produtos.content}">
-                <dialog th:id="'modal-' + ${produto.id}" class="modal modal-bottom sm:modal-middle">
-                    <div class="modal-box max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-100">
-
-                        <!-- Cabeçalho do modal -->
-                        <div class="flex items-start justify-between mb-6 pb-4 border-b border-slate-100">
-                            <div>
-                                <h3 class="font-extrabold text-xl text-slate-900"
-                                    th:text="${produto.nome}">Produto</h3>
-                                <span class="text-xs font-mono text-slate-400 mt-0.5 block"
-                                      th:text="${produto.codigoSku}">SKU</span>
-                            </div>
-                            <form method="dialog">
-                                <button class="btn btn-sm btn-ghost btn-circle text-slate-400 hover:text-slate-600">
-                                    <i class="fa-solid fa-xmark text-lg"></i>
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Grelha de detalhes -->
-                        <div class="grid grid-cols-2 gap-x-8 gap-y-4 text-sm">
-
-                            <div>
-                                <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs mb-0.5">Estado Físico</p>
-                                <span th:with="label=${@enumDisplayHelper.getEstadoFisicoLabel(produto.estadoFisico)}"
-                                      th:text="${label}"
-                                      th:classappend="${produto.estadoFisico == 'LIQUIDO'} ? 'badge badge-info badge-outline' : 'badge badge-warning badge-outline'"
-                                      class="badge font-medium">—</span>
-                            </div>
-
-                            <div>
-                                <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs mb-0.5">Abreviação de Sabor</p>
-                                <p class="font-semibold text-slate-800" th:text="${produto.abreviacaoSabor ?: '—'}">—</p>
-                            </div>
-
-                            <div>
-                                <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs mb-0.5">Preço por kg</p>
-                                <p class="font-bold text-slate-800 text-base"
-                                   th:text="${produto.precoPorKg != null ? #numbers.formatDecimal(produto.precoPorKg, 1, 2) + ' €' : '—'}">—</p>
-                            </div>
-
-                            <div>
-                                <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs mb-0.5">Preço de Venda</p>
-                                <p class="font-semibold text-slate-800"
-                                   th:text="${produto.precoVenda != null ? #numbers.formatDecimal(produto.precoVenda, 1, 2) + ' €' : '—'}">—</p>
-                            </div>
-
-                            <div>
-                                <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs mb-0.5">Taxa de IVA</p>
-                                <p class="font-semibold text-slate-800"
-                                   th:text="${produto.taxaIva != null ? #numbers.formatDecimal(produto.taxaIva * 100, 1, 0) + ' %' : '—'}">—</p>
-                            </div>
-
-                            <div>
-                                <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs mb-0.5">Validade</p>
-                                <p class="font-semibold text-slate-800"
-                                   th:text="${produto.validadeDias != null ? produto.validadeDias + ' dias' : '—'}">—</p>
-                            </div>
-
-                            <div>
-                                <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs mb-0.5">Quantidade por Lote</p>
-                                <p class="font-semibold text-slate-800"
-                                   th:text="${produto.quantidadeLote ?: '—'}">—</p>
-                            </div>
-
-                        </div>
-
-                        <!-- Descrição -->
-                        <div th:if="${produto.descricao != null and !produto.descricao.isEmpty()}"
-                             class="mt-5 pt-4 border-t border-slate-100">
-                            <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs mb-1">Descrição</p>
-                            <p class="text-slate-600 text-sm leading-relaxed" th:text="${produto.descricao}">—</p>
-                        </div>
-
-                        <!-- Composição -->
-                        <div th:if="${produto.composicao != null and !produto.composicao.isEmpty()}"
-                             class="mt-5 pt-4 border-t border-slate-100">
-                            <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs mb-3">Composição</p>
-                            <div class="overflow-x-auto">
-                                <table class="table table-xs w-full">
-                                    <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
-                                        <tr>
-                                            <th>Matéria-Prima</th>
-                                            <th>Unidade</th>
-                                            <th class="text-right">Qty / Unidade</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:each="item : ${produto.composicao}"
-                                            class="border-b border-slate-50 last:border-0">
-                                            <td class="font-medium text-slate-700" th:text="${item.materiaNome}">—</td>
-                                            <td class="text-slate-500" th:text="${item.materiaUnidade}">—</td>
-                                            <td class="text-right font-semibold text-slate-700"
-                                                th:text="${item.quantidadePorUnidadeProduto != null ? #numbers.formatDecimal(item.quantidadePorUnidadeProduto, 1, 4) : '—'}">—</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Rodapé do modal -->
-                        <div class="modal-action mt-6 pt-4 border-t border-slate-100">
-                            <form method="dialog">
-                                <button class="btn bg-white border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold shadow-sm">
-                                    Fechar
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    <!-- Clique fora para fechar -->
-                    <form method="dialog" class="modal-backdrop">
-                        <button>fechar</button>
-                    </form>
-                </dialog>
-            </th:block>
-
         </div>
     </div>
 </body>
-
-<script>
-    document.querySelectorAll('.btn-detalhes').forEach(btn => {
-        btn.addEventListener('click', function () {
-            document.getElementById(this.dataset.modalId).showModal();
-        });
-    });
-</script>
 </html>

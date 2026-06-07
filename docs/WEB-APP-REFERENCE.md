@@ -28,21 +28,28 @@ web-app/src/main/
 │   │   ├── ApiQuery.java               ← Executor síncrono: LOADING → SUCCESS | ERROR
 │   │   ├── QueryState.java             ← State machine imutável
 │   │   ├── RetrofitClient.java         ← Singleton OkHttp + Retrofit + Gson adapters
-│   │   ├── IProdutoCatalogoApiService.java  ← GET /produtos-finais/catalogo
+│   │   ├── IProdutoCatalogoApiService.java  ← GET /produtos-finais/catalogo + GET /produtos-finais/{id}
 │   │   └── IPalletTipoApiService.java       ← GET /pallet-tipos
 │   ├── config/
 │   │   └── ApiConfig.java              ← Lê config.properties
 │   ├── controller/
 │   │   ├── WebController.java          ← Rotas genéricas (/, /login, /client-area, /encomendas)
-│   │   └── CatalogoController.java     ← GET /catalogo (com parâmetros page, size)
+│   │   ├── CatalogoController.java     ← GET /catalogo (com parâmetros page, size)
+│   │   └── ProdutoDetalheController.java ← GET /produto/{id} + POST /produto/{id}/adicionar-carrinho
 │   ├── model/
 │   │   ├── PaginatedResponse.java      ← Wrapper genérico para respostas paginadas Spring
+│   │   ├── SessionUser.java            ← Utilizador de sessão (mock → real)
+│   │   ├── carrinho/
+│   │   │   ├── CarrinhoItem.java       ← Uma linha do carrinho (produto + pallet + qty)
+│   │   │   └── Carrinho.java           ← Carrinho guardado em sessão HTTP
 │   │   └── catalogo/
-│   │       ├── ProdutoCatalogoResponse.java  ← Modelo do endpoint /produtos-finais/catalogo
+│   │       ├── ProdutoCatalogoResponse.java  ← Modelo de /produtos-finais/catalogo e /produtos-finais/{id}
 │   │       └── PalletTipoResponse.java       ← Modelo do endpoint /pallet-tipos
 │   ├── service/
-│   │   ├── ProdutoCatalogoService.java  ← Encapsula chamadas HTTP ao catálogo
-│   │   └── PalletTipoService.java       ← Encapsula chamadas HTTP aos tipos de pallet
+│   │   ├── ProdutoCatalogoService.java  ← getCatalogo() + getById()
+│   │   ├── PalletTipoService.java       ← Encapsula chamadas HTTP aos tipos de pallet
+│   │   ├── CarrinhoService.java         ← Gestão do carrinho em sessão HTTP
+│   │   └── SessionService.java          ← Gestão do utilizador em sessão HTTP
 │   └── util/
 │       └── EnumDisplayHelper.java       ← @Component para converter enums em português
 └── resources/
@@ -58,7 +65,8 @@ web-app/src/main/
         ├── index.html                  ← Página pública de landing
         ├── login.html                  ← Formulário de login
         ├── client-area.html            ← Dashboard B2B
-        ├── catalogo.html               ← Catálogo paginado de produtos
+        ├── catalogo.html               ← Catálogo paginado de produtos (link para detalhe)
+        ├── produto-detalhe.html        ← Detalhe de produto + painel de carrinho
         └── encomendas.html             ← Histórico de encomendas
 ```
 
@@ -323,4 +331,130 @@ Editar apenas `src/main/resources/config.properties`:
 api.base.url=http://localhost:8081/
 api.timeout.seconds=30
 api.logging.enabled=true
+```
+
+---
+
+## Carrinho de Compras
+
+### Modelos
+
+| Classe | Ficheiro | Função |
+|--------|----------|--------|
+| `CarrinhoItem` | `model/carrinho/CarrinhoItem.java` | Uma linha do carrinho (produto + pallet + qty) |
+| `Carrinho` | `model/carrinho/Carrinho.java` | Lista de itens; guardada na sessão HTTP |
+
+### CarrinhoService — API
+
+```java
+@Autowired
+private CarrinhoService carrinhoService;
+
+// Ler carrinho (cria vazio se ausente)
+Carrinho carrinho = carrinhoService.getCarrinho(session);
+
+// Adicionar item
+CarrinhoItem item = new CarrinhoItem(produtoId, produtoNome,
+                                     palletTipoId, palletTipoNome,
+                                     quantidadePallets);
+carrinhoService.adicionarItem(session, item);
+
+// Remover por índice (0-based)
+carrinhoService.removerItem(session, 0);
+
+// Limpar tudo
+carrinhoService.limparCarrinho(session);
+
+// Contar itens (para badge na navbar)
+int total = carrinhoService.contarItens(session);
+```
+
+### Padrão de utilização num controller
+
+```java
+@Controller
+public class MeuController {
+
+    @Autowired private CarrinhoService carrinhoService;
+
+    @GetMapping("/minha-pagina")
+    public String pagina(HttpSession session, Model model) {
+        model.addAttribute("carrinho", carrinhoService.getCarrinho(session));
+        return "minha-pagina";
+    }
+}
+```
+
+### No template Thymeleaf
+
+```html
+<!-- Badge de itens no carrinho -->
+<span th:text="${carrinho.totalItens()}">0</span>
+
+<!-- Verificar se vazio -->
+<div th:if="${!carrinho.isEmpty()}">
+    <th:block th:each="item : ${carrinho.items}">
+        <span th:text="${item.produtoNome}"></span>
+        <span th:text="${item.quantidadePallets}"></span>
+    </th:block>
+</div>
+```
+
+### Chave de sessão
+
+O `CarrinhoService` guarda o `Carrinho` sob a chave de sessão `"carrinho"`.
+Não aceder directamente à sessão — usar sempre o serviço.
+
+---
+
+## Padrão de Página de Detalhe
+
+### Quando usar página de detalhe vs modal
+
+| Cenário | Recomendação |
+|---------|-------------|
+| Lista simples + consulta rápida de poucos campos | Modal (como era no catálogo) |
+| Página com muitos campos, acções, formulários | **Página de detalhe dedicada** |
+| PRG (Post-Redirect-Get) necessário | **Obrigatório página de detalhe** |
+
+A partir desta versão, o catálogo usa páginas de detalhe (`/produto/{id}`) em vez de modais.
+
+### Estrutura de uma página de detalhe
+
+```
+controller/ProdutoDetalheController.java   ← GET + POST
+templates/produto-detalhe.html             ← Template com dois painéis
+```
+
+### PRG (Post-Redirect-Get)
+
+Todos os formulários de acção (ex.: adicionar ao carrinho) seguem o padrão PRG:
+
+```java
+@PostMapping("/produto/{id}/adicionar-carrinho")
+public String adicionarAoCarrinho(@PathVariable String id, ...) {
+    // processar ...
+    return "redirect:/produto/" + id;  // ← PRG: nunca return "view-name" após POST
+}
+```
+
+**Porquê?** Evita resubmissão ao recarregar a página (F5 após um POST).
+
+### Passar valores do servidor para JavaScript
+
+> [!IMPORTANT]
+> Nunca colocar expressões Thymeleaf dentro de strings JavaScript.
+> Usar **data attributes** no HTML e ler com `dataset` em JS.
+
+```html
+<!-- Correcto: data attribute no HTML -->
+<div id="cart-panel" th:data-preco="${produto.precoPorKg}">
+
+<!-- Incorrecto: nunca fazer isto -->
+<script>const preco = [[${produto.precoPorKg}]];</script>
+```
+
+```javascript
+// Ler em JS via data attribute
+const preco = parseFloat(document.getElementById('cart-panel').dataset.preco) || 0;
 ```

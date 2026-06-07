@@ -5,16 +5,18 @@ import com.example.webapp.model.catalogo.ProdutoCatalogoResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
  * Interface Retrofit para os endpoints do catálogo de produtos finais visíveis ao cliente.
  *
- * <p>Endpoint documentado em {@code GET /produtos-finais/catalogo}
- * (tag {@code produto-final-controller}, operationId {@code findAllVisivelCliente}).</p>
- *
- * <p>Parâmetros suportados pela API: {@code page} (default 0), {@code size} (default 10).
- * O endpoint <strong>não suporta</strong> {@code sort} nem {@code direction}.</p>
+ * <p>Endpoints documentados:
+ * <ul>
+ *   <li>{@code GET /produtos-finais/catalogo} — lista paginada (visivelCliente=true)</li>
+ *   <li>{@code GET /produtos-finais/{id}} — detalhe de um produto por UUID</li>
+ * </ul>
+ * </p>
  *
  * <p>Utilização:</p>
  * <pre>{@code
@@ -35,5 +37,19 @@ public interface IProdutoCatalogoApiService {
     Call<PaginatedResponse<ProdutoCatalogoResponse>> findAllCatalogo(
             @Query("page") int page,
             @Query("size") int size
+    );
+
+    /**
+     * Devolve o detalhe completo de um produto final pelo seu UUID.
+     *
+     * <p>Endpoint: {@code GET /produtos-finais/{id}}
+     * (operationId {@code findById_1}).</p>
+     *
+     * @param id UUID do produto (formato string)
+     * @return {@link Call} com o {@link ProdutoCatalogoResponse} completo
+     */
+    @GET("produtos-finais/{id}")
+    Call<ProdutoCatalogoResponse> findById(
+            @Path("id") String id
     );
 }

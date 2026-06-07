@@ -1,8 +1,9 @@
-package com.gestaoiogurtes.webapp.service;
+package com.example.webapp.service;
 
-import com.gestaoiogurtes.webapp.model.SessionUser;
+import com.example.webapp.model.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
+import java.util.UUID;
 
 @Service
 public class SessionService {
@@ -11,11 +12,10 @@ public class SessionService {
 
     // ── MOCK — substitui pelo login real depois ──────────────────
     private static final SessionUser MOCK_USER = new SessionUser(
-        UUID.fromString("d8186030-e499-4790-ba2e-8c19567ca229"),
-        "Pedro Santos",
-        "pedro.santos@empresa.com",
-        "CLIENTE"
-    );
+            UUID.fromString("d8186030-e499-4790-ba2e-8c19567ca229"),
+            "Pedro Santos",
+            "pedro.santos@empresa.com",
+            "CLIENTE");
 
     /**
      * Devolve o utilizador da sessão HTTP.
@@ -23,7 +23,8 @@ public class SessionService {
      * Em produção: lê da sessão HTTP (ver guia abaixo).
      */
     public SessionUser getUser(HttpSession session) {
-        // TODO: substituir por -> return (SessionUser) session.getAttribute(SESSION_KEY);
+        // TODO: substituir por -> return (SessionUser)
+        // session.getAttribute(SESSION_KEY);
         return MOCK_USER;
     }
 

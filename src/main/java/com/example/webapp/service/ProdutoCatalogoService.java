@@ -65,6 +65,34 @@ public class ProdutoCatalogoService {
         return result[0];
     }
 
+    /**
+     * Devolve o detalhe completo de um produto final pelo seu UUID.
+     *
+     * @param id UUID do produto (formato string)
+     * @return produto encontrado
+     * @throws ProdutoCatalogoException se o produto não existir ou ocorrer erro de API
+     */
+    public ProdutoCatalogoResponse getById(String id) {
+        final ProdutoCatalogoResponse[] result = {null};
+        final String[] errorMessage = {null};
+
+        ApiQuery.execute(api.findById(id), state -> {
+            if (state.isSuccess()) {
+                result[0] = state.getData();
+            } else if (state.isError()) {
+                errorMessage[0] = state.getErrorMessage();
+                log.error("Erro ao obter produto {}: {}", id, state.getErrorMessage(),
+                        state.getError());
+            }
+        });
+
+        if (errorMessage[0] != null) {
+            throw new ProdutoCatalogoException(errorMessage[0]);
+        }
+
+        return result[0];
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // Excepção específica deste serviço
     // ──────────────────────────────────────────────────────────────────────────

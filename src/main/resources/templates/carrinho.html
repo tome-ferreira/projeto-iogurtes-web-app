@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(title='Carrinho de Compras | Área B2B', activePage='carrinho', content=~{::#main-content})}">
+<body>
+    <div id="main-content">
+        <div class="space-y-8">
+
+            <!-- ══ CABEÇALHO DA SECÇÃO ══════════════════════════════════════ -->
+            <div class="border-b border-slate-200 pb-6">
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Carrinho de Compras</h1>
+                <p class="text-slate-500 mt-1">Gira os itens que pretende encomendar.</p>
+            </div>
+
+            <!-- ══ ALERTA DE SUCESSO/ERRO (REMOVER ITEM) ═══════════════════ -->
+            <div th:if="${successMessage != null}"
+                 class="alert bg-green-50 border border-green-200 text-green-700 rounded-xl flex items-start gap-3 p-4">
+                <i class="fa-solid fa-circle-check mt-0.5 flex-shrink-0"></i>
+                <p class="font-medium text-sm" th:text="${successMessage}"></p>
+            </div>
+            <div th:if="${errorMessage != null}"
+                 class="alert bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-start gap-3 p-4">
+                <i class="fa-solid fa-triangle-exclamation mt-0.5 flex-shrink-0"></i>
+                <p class="font-medium text-sm" th:text="${errorMessage}"></p>
+            </div>
+
+            <!-- ══ CONTEÚDO PRINCIPAL ════════════════════════════════════════ -->
+
+            <!-- Estado: Vazio -->
+            <div th:if="${carrinho == null or carrinho.isEmpty()}" 
+                 class="bg-white border border-slate-100 rounded-2xl shadow-sm p-12 text-center flex flex-col items-center justify-center">
+                
+                <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6 text-slate-300">
+                    <i class="fa-solid fa-cart-shopping fa-3x"></i>
+                </div>
+                <h2 class="text-xl font-bold text-slate-700 mb-2">O seu carrinho está vazio</h2>
+                <p class="text-slate-500 max-w-sm mb-8">Neste momento não tem nenhum produto adicionado ao seu carrinho de compras.</p>
+                
+                <a th:href="@{/catalogo}" class="btn btn-primary shadow-sm hover:shadow-md transition-shadow">
+                    <i class="fa-solid fa-book-open mr-2"></i> Voltar ao Catálogo
+                </a>
+            </div>
+
+            <!-- Estado: Com Itens -->
+            <div th:if="${carrinho != null and !carrinho.isEmpty()}" class="flex flex-col lg:flex-row gap-8">
+                
+                <!-- Coluna Esquerda: Lista de Itens -->
+                <div class="flex-1 min-w-0 bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800">
+                            Itens <span class="badge badge-sm badge-primary ml-2" th:text="${carrinho.totalItens()}">0</span>
+                        </h3>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="table w-full">
+                            <thead class="bg-slate-50/80 text-slate-500 font-semibold text-xs uppercase tracking-wider">
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Tipo de Pallet</th>
+                                    <th class="text-center">Quantidade</th>
+                                    <th class="text-right">Preço Unitário</th>
+                                    <th class="text-right">Subtotal</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item, stat : ${carrinho.items}"
+                                    class="hover:bg-slate-50/40 transition-colors border-b border-slate-50 last:border-0">
+                                    
+                                    <!-- Produto -->
+                                    <td>
+                                        <a th:href="@{/produto/{id}(id=${item.produtoId})}" class="font-bold text-slate-800 hover:text-blue-600 transition-colors">
+                                            <span th:text="${item.produtoNome}">Nome</span>
+                                        </a>
+                                    </td>
+                                    
+                                    <!-- Pallet -->
+                                    <td class="text-slate-600 text-sm" th:text="${item.palletTipoNome}">
+                                        Tipo Pallet
+                                    </td>
+                                    
+                                    <!-- Qty -->
+                                    <td class="text-center">
+                                        <div class="inline-block bg-slate-100 border border-slate-200 rounded-lg px-3 py-1 font-semibold text-slate-700">
+                                            <span th:text="${item.quantidadePallets}">1</span>
+                                        </div>
+                                    </td>
+                                    
+                                    <!-- Preço Unitário -->
+                                    <td class="text-right text-sm font-medium text-slate-500">
+                                        <span th:text="${#numbers.formatDecimal(item.precoUnitario, 1, 2) + ' €'}">0,00 €</span>
+                                    </td>
+                                    
+                                    <!-- Subtotal -->
+                                    <td class="text-right font-extrabold text-slate-800">
+                                        <span th:text="${#numbers.formatDecimal(item.precoTotal, 1, 2) + ' €'}">0,00 €</span>
+                                    </td>
+
+                                    <!-- Remover -->
+                                    <td class="w-16 text-right">
+                                        <form th:action="@{/carrinho/remover/{index}(index=${stat.index})}" method="post">
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-circle btn-ghost text-red-500 hover:bg-red-50 hover:text-red-700"
+                                                    title="Remover item">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Coluna Direita: Resumo da Encomenda -->
+                <div class="w-full lg:w-96 shrink-0">
+                    <div class="sticky top-8 bg-white border border-slate-100 rounded-2xl shadow-sm p-6 space-y-6">
+                        
+                        <div class="pb-4 border-b border-slate-100">
+                            <h2 class="font-extrabold text-slate-900 text-lg flex items-center gap-2">
+                                <i class="fa-solid fa-file-invoice-dollar text-blue-600"></i>
+                                Resumo
+                            </h2>
+                        </div>
+
+                        <!-- Detalhes Faturação -->
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between items-center text-slate-500">
+                                <span>Subtotal Encomenda</span>
+                                <span class="font-semibold text-slate-700" th:text="${#numbers.formatDecimal(carrinho.getTotalCarrinho(), 1, 2) + ' €'}">0,00 €</span>
+                            </div>
+
+                        </div>
+
+                        <!-- Total -->
+                        <div class="pt-4 border-t border-slate-100 bg-blue-50/50 -mx-6 px-6 py-4 rounded-b-2xl">
+                            <div class="flex justify-between items-end">
+                                <span class="font-semibold text-slate-500 uppercase tracking-wider text-xs">Total Estimado</span>
+                                <span class="text-3xl font-extrabold text-blue-700" th:text="${#numbers.formatDecimal(carrinho.getTotalCarrinho(), 1, 2) + ' €'}">0,00 €</span>
+                            </div>
+
+                            
+                            <!-- Checkout Button -->
+                            <button type="button" 
+                                    class="btn btn-primary w-full mt-6 shadow-md shadow-blue-200/50 group"
+                                    onclick="alert('A funcionalidade de Checkout será implementada em breve!')">
+                                Finalizar Encomenda 
+                                <i class="fa-solid fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                            </button>
+                            
+                            <a th:href="@{/catalogo}" class="btn btn-ghost w-full mt-2 text-slate-500 hover:text-slate-700 text-sm">
+                                Continuar a comprar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
