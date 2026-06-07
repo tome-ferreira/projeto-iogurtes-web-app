@@ -158,10 +158,13 @@ public class ProdutoDetalheController {
             log.warn("Falha ao obter capacidade da pallet, usará fallback de 1kg", e);
         }
 
-        // 3. Calcular preço total da linha
-        // Preço Unitário = preço do produto por Kg * capacidade da pallet (quantos Kg leva uma pallet)
+        // 3. Calcular preço total da linha com IVA
+        // Preço Unitário = (preço por Kg * capacidade da pallet) * (1 + taxaIVA/100)
         double precoBase = produto.precoPorKg != null ? produto.precoPorKg.doubleValue() : 0.0;
-        double precoUnitario = precoBase * capacidadePalletKg;
+        double taxaIva = produto.taxaIva != null ? produto.taxaIva.doubleValue() : 0.0;
+        
+        double precoUnitarioBase = precoBase * capacidadePalletKg;
+        double precoUnitario = precoUnitarioBase * (1.0 + (taxaIva / 100.0));
         double precoTotal = precoUnitario * quantidadePallets;
 
         CarrinhoItem item = new CarrinhoItem(

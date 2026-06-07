@@ -141,12 +141,13 @@
 
                             
                             <!-- Checkout Button -->
-                            <button type="button" 
-                                    class="btn btn-primary w-full mt-6 shadow-md shadow-blue-200/50 group"
-                                    onclick="alert('A funcionalidade de Checkout será implementada em breve!')">
-                                Finalizar Encomenda 
-                                <i class="fa-solid fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
-                            </button>
+                            <form th:action="@{/carrinho/finalizar}" method="post">
+                                <button type="submit" 
+                                        class="btn btn-primary w-full mt-6 shadow-md shadow-blue-200/50 group">
+                                    Finalizar Encomenda 
+                                    <i class="fa-solid fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                                </button>
+                            </form>
                             
                             <a th:href="@{/catalogo}" class="btn btn-ghost w-full mt-2 text-slate-500 hover:text-slate-700 text-sm">
                                 Continuar a comprar
