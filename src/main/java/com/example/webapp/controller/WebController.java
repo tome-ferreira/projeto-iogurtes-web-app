@@ -28,8 +28,4 @@ public class WebController {
         return "client-area";
     }
 
-    @GetMapping("/encomendas")
-    public String encomendas() {
-        return "encomendas";
-    }
 }
