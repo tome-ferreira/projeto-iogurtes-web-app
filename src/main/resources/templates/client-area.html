@@ -6,47 +6,69 @@
             <!-- Header Section / Boas-vindas -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Olá, Parceiro Norgurtes</h1>
-                    <p class="text-slate-500 mt-1">Bem-vindo ao seu painel de gestão B2B.</p>
+                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight" th:text="'Olá, ' + ${userName}">Olá, Parceiro Norgurtes</h1>
+                    
                 </div>
-                <a th:href="@{/catalogo}" class="btn btn-primary bg-blue-700 hover:bg-blue-800 text-white border-none shadow-lg shadow-blue-100/50">
-                    <i class="fa-solid fa-plus mr-2"></i> Nova Encomenda
-                </a>
+                
             </div>
 
             <!-- Cards de Métricas (daisyUI stats) -->
             <div class="stats stats-vertical lg:stats-horizontal shadow-sm border border-slate-100 w-full bg-white rounded-2xl">
                 
                 <div class="stat">
-                    <div class="stat-figure text-red-500 bg-red-50 p-3 rounded-xl">
-                        <i class="fa-solid fa-xmark fa-xl"></i>
+                    <div class="stat-figure text-slate-500 bg-slate-50 p-3 rounded-xl">
+                        <i class="fa-solid fa-clock-rotate-left fa-xl"></i>
                     </div>
-                    <div class="stat-title font-semibold text-slate-500">Encomendas Canceladas</div>
-                    <div class="stat-value text-slate-800 text-4xl">0</div>
-                    
+                    <div class="stat-title font-semibold text-slate-500">Pendentes</div>
+                    <div class="stat-value text-slate-800 text-4xl" th:text="${totalPendentes}">0</div>
                 </div>
                 
                 <div class="stat">
                     <div class="stat-figure text-blue-500 bg-blue-50 p-3 rounded-xl">
                         <i class="fa-solid fa-truck-fast fa-xl"></i>
                     </div>
-                    <div class="stat-title font-semibold text-slate-500">Encomendas Expedidas</div>
-                    <div class="stat-value text-slate-800 text-4xl">0</div>
-                    
+                    <div class="stat-title font-semibold text-slate-500">Expedidas</div>
+                    <div class="stat-value text-slate-800 text-4xl" th:text="${totalExpedidas}">0</div>
                 </div>
                 
                 <div class="stat">
-                    <div class="stat-figure text-emerald-500 bg-emerald-50 p-3 rounded-xl">
-                        <i class="fa-solid fa-check-double fa-xl"></i>
+                    <div class="stat-figure text-red-500 bg-red-50 p-3 rounded-xl">
+                        <i class="fa-solid fa-xmark fa-xl"></i>
                     </div>
-                    <div class="stat-title font-semibold text-slate-500">Encomendas Entregues</div>
-                    <div class="stat-value text-slate-800 text-4xl">0</div>
-                    
+                    <div class="stat-title font-semibold text-slate-500">Canceladas</div>
+                    <div class="stat-value text-slate-800 text-4xl" th:text="${totalCanceladas}">0</div>
                 </div>
                 
             </div>
+            <!-- Produtos Recentes -->
+            <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden mt-8">
+                <!-- Toolbar -->
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800 text-lg">Produtos Recentes</h3>
+                    <a th:href="@{/catalogo}" class="btn btn-sm btn-primary bg-blue-700 hover:bg-blue-800 text-white border-none shadow-sm">
+                        Todos os produtos
+                    </a>
+                </div>
 
-            
+                <div class="p-0">
+                    <!-- Estado vazio -->
+                    <div th:if="${produtosRecentes == null or produtosRecentes.isEmpty()}" class="py-12 text-center">
+                        <p class="text-slate-600 font-medium">Ainda não realizou nenhuma encomenda.</p>
+                        <a th:href="@{/catalogo}" class="text-blue-600 font-semibold hover:underline mt-2 inline-block">Explorar catálogo</a>
+                    </div>
+
+                    <!-- Lista de Produtos -->
+                    <div th:if="${produtosRecentes != null and !produtosRecentes.isEmpty()}" class="flex flex-col">
+                        <div th:each="produto : ${produtosRecentes}" class="flex items-center justify-between p-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors">
+                            <span class="font-semibold text-slate-800" th:text="${produto.nome}">Nome do Produto</span>
+                            <a th:href="@{/produto/{id}(id=${produto.id})}" class="text-blue-600 hover:text-blue-800 font-semibold text-sm flex items-center gap-1">
+                                Ver detalhes <i class="fa-solid fa-chevron-right text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </body>

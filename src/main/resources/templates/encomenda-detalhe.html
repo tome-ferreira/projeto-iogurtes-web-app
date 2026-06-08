@@ -106,7 +106,7 @@
                                                 <span class="text-xs text-slate-400 block" th:if="${pallet.palletCapacidadeKg != null}" th:text="${#numbers.formatDecimal(pallet.palletCapacidadeKg, 1, 0)} + ' kg'"></span>
                                             </td>
                                             <td class="text-center font-semibold" th:text="${pallet.quantidadePallets}">0</td>
-                                            <td class="text-right" th:text="${pallet.precoPorPalletEur != null ? #numbers.formatDecimal(pallet.precoPorPalletEur, 1, 2) + ' €' : '—'}">—</td>
+                                            <td class="text-right" th:text="${pallet.precoPorPalletEur != null ? #numbers.formatDecimal(pallet.precoPorPalletEur * (1 + (pallet.taxaIva != null ? pallet.taxaIva : 0.0) / 100.0), 1, 2) + ' €' : '—'}">—</td>
                                             <td class="text-right font-semibold text-slate-800" th:text="${pallet.subtotalComIvaEur != null ? #numbers.formatDecimal(pallet.subtotalComIvaEur, 1, 2) + ' €' : '—'}">—</td>
                                         </tr>
                                     </tbody>

@@ -23,9 +23,4 @@ public class WebController {
         return "redirect:/client-area";
     }
 
-    @GetMapping("/client-area")
-    public String clientArea() {
-        return "client-area";
-    }
-
 }
