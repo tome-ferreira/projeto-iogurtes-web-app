@@ -1,63 +1,111 @@
-# Como usar nos controllers:
+# SessionService — Guia de Referência
+
+## Visão Geral
+
+O `SessionService` gere o ciclo de vida do utilizador autenticado na sessão HTTP (`HttpSession`).
+O utilizador é representado por `SessionUser`, que inclui o token JWT devolvido pela API após o login.
+
+---
+
+## SessionUser — Campos
+
+| Campo   | Tipo     | Descrição                               |
+|---------|----------|-----------------------------------------|
+| `id`    | `UUID`   | Identificador único do utilizador       |
+| `nome`  | `String` | Nome completo                           |
+| `email` | `String` | Endereço de e-mail                      |
+| `role`  | `String` | Papel do utilizador (ex.: `"CLIENTE"`)  |
+| `token` | `String` | Token JWT para autenticação na API REST |
+
+O campo `token` é definido via `user.setToken(resp.token)` após o login bem-sucedido.
+
+---
+
+## Métodos
+
+| Método                                           | Descrição                                                        |
+|--------------------------------------------------|------------------------------------------------------------------|
+| `getUser(HttpSession session)`                   | Devolve o `SessionUser` da sessão, ou `null` se não autenticado |
+| `setUser(HttpSession session, SessionUser user)` | Guarda o utilizador na sessão (incluindo token)                  |
+| `clearUser(HttpSession session)`                 | Remove o utilizador (e token) da sessão                          |
+| `isAuthenticated(HttpSession session)`           | `true` se existir utilizador na sessão                           |
+
+---
+
+## Ciclo de Vida — Login/Logout
+
+```
+Utilizador submete credenciais
+         ↓
+AuthController.login() chama AuthService.login(email, password)
+         ↓
+AuthService faz POST /auth/login à API REST (síncrono)
+         ↓
+LoginResponse { id, nome, email, role, token }
+         ↓
+SessionUser user = new SessionUser(id, nome, email, role)
+user.setToken(token)
+sessionService.setUser(session, user)
+         ↓
+redirect → /client-area (ou dashboard por role)
+```
+
+```
+Utilizador clica "Terminar Sessão"
+         ↓
+POST /logout → AuthController.logout()
+         ↓
+sessionService.clearUser(session)
+session.invalidate()
+         ↓
+redirect → /login
+```
+
+---
+
+## Como Usar nos Controllers
 
 ```java
 @Controller
-public class CatalogoController {
+public class DashboardController {
 
     @Autowired
     private SessionService sessionService;
 
-    @GetMapping("/catalogo")
-    public String catalogo(HttpSession session, Model model) {
+    @GetMapping("/client-area")
+    public String clientArea(HttpSession session, Model model) {
         SessionUser user = sessionService.getUser(session);
-        model.addAttribute("user", user);
-        // ...
-        return "catalogo";
+        if (user == null) {
+            return "redirect:/login"; // protecção defensiva (o interceptor faz isto automaticamente)
+        }
+        model.addAttribute("userName", user.getNome());
+        return "client-area";
     }
 }
 ```
 
-# Como usar no Thymeleaf:
+---
+
+## Como Usar no Thymeleaf
 
 ```html
 <span th:text="${user.nome}">Nome</span>
 <span th:text="${user.role}">Role</span>
 ```
 
-# Como migrar para login real:
+---
 
-## 1 passo:
+## Proteção de Rotas
 
-No controller de login, após validar as credenciais contra a API:
+A protecção é feita automaticamente pelo `AuthInterceptor` (registado no `WebMvcConfig`).
+Não é necessário verificar manualmente a sessão em cada controller — apenas como salvaguarda defensiva.
 
-```java
-SessionUser user = new SessionUser(
-    apiResponse.id,
-    apiResponse.nome,
-    apiResponse.email,
-    apiResponse.role
-);
-sessionService.setUser(session, user);
-```
+Rotas **públicas** (excluídas do interceptor):
+- `/` — landing page
+- `/login` — formulário de login
+- `/logout` — endpoint de logout
+- `/css/**`, `/js/**`, `/images/**`, `/webjars/**` — recursos estáticos
 
-## 2 passo:
+---
 
- Em ``SessionService.getUser()``, substituir o mock:
-
-```java
-// Antes (mock):
-return MOCK_USER;
-
-// Depois (real):
-SessionUser user = (SessionUser) session.getAttribute(SESSION_KEY);
-if (user == null) throw new UnauthorizedException(); // ou redirect para login
-return user;
-```
-
-## 3 passo:
-
-Adicionar um interceptor Spring MVC que verifica se há utilizador na sessão em cada pedido protegido, redirecionando para /login se não existir.
-
-## 4 passo:
-
-Remover o ``MOCK_USER``.
+> **Nota:** Não existe MOCK_USER. O `getUser()` devolve sempre o utilizador real da sessão, ou `null`.

@@ -7,6 +7,7 @@ public class SessionUser {
     private String nome;
     private String email;
     private String role;
+    private String token;
 
     public SessionUser(UUID id, String nome, String email, String role) {
         this.id    = id;
@@ -16,8 +17,12 @@ public class SessionUser {
     }
 
     // Getters
-    public UUID getId()    { return id; }
+    public UUID getId()      { return id; }
     public String getNome()  { return nome; }
     public String getEmail() { return email; }
     public String getRole()  { return role; }
+    public String getToken() { return token; }
+
+    // Setter (token é definido após o login, separadamente)
+    public void setToken(String token) { this.token = token; }
 }

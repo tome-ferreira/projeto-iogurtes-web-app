@@ -71,9 +71,11 @@
             </ul>
         </nav>
         <div class="p-4 border-t border-slate-100">
-            <a th:href="@{/}" class="btn btn-ghost w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700">
-                <i class="fa-solid fa-arrow-right-from-bracket w-5"></i> Terminar Sessão
-            </a>
+            <form th:action="@{/logout}" method="POST">
+                <button type="submit" class="btn btn-ghost w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700">
+                    <i class="fa-solid fa-arrow-right-from-bracket w-5"></i> Terminar Sessão
+                </button>
+            </form>
         </div>
     </aside>
 
@@ -96,7 +98,11 @@
                                 <span class="badge badge-xs badge-primary ml-auto" th:text="${session.carrinho.totalItens()}">0</span>
                             </a>
                         </li>
-                        <li class="mt-2 pt-2 border-t border-slate-100"><a th:href="@{/}" class="text-red-600">Terminar Sessão</a></li>
+                        <li class="mt-2 pt-2 border-t border-slate-100">
+                            <form th:action="@{/logout}" method="POST">
+                                <button type="submit" class="text-red-600 w-full text-left">Terminar Sessão</button>
+                            </form>
+                        </li>
                     </ul>
                 </div>
             </div>

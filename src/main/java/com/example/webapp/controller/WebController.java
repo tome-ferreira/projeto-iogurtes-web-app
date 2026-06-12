@@ -2,8 +2,18 @@ package com.example.webapp.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 
+/**
+ * Controller genérico para rotas públicas.
+ *
+ * <h3>Rotas</h3>
+ * <ul>
+ *   <li>{@code GET /} — página de landing (pública)</li>
+ * </ul>
+ *
+ * <p>As rotas de autenticação (/login, /logout) estão em
+ * {@link AuthController}.</p>
+ */
 @Controller
 public class WebController {
 
@@ -12,15 +22,5 @@ public class WebController {
         return "index";
     }
 
-    @GetMapping("/login")
-    public String login() {
-        return "login";
-    }
-
-    @PostMapping("/login")
-    public String handleLogin() {
-        // Redireciona para a área de cliente após a submissão do formulário no frontend
-        return "redirect:/client-area";
-    }
-
 }
+

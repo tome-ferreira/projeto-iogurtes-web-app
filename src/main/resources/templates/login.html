@@ -61,7 +61,8 @@
                         </label>
                         <div class="relative flex items-center">
                             <span class="absolute left-4 text-slate-400"><i class="fa-solid fa-envelope"></i></span>
-                            <input type="email" name="email" placeholder="nome@empresa.com" 
+                            <input type="email" name="email" placeholder="nome@empresa.com"
+                                   th:value="${email}"
                                    class="input input-bordered w-full pl-11 bg-slate-50 focus:bg-white focus:border-blue-700 border-slate-200" required />
                         </div>
                     </div>
@@ -89,9 +90,15 @@
                         </label>
                     </div>
 
+                    <!-- Mensagem de erro (credenciais inválidas ou erro de rede) -->
+                    <div th:if="${error}" class="alert alert-error text-sm flex items-start gap-3 rounded-xl border-0 bg-red-50 text-red-700 py-3 px-4">
+                        <i class="fa-solid fa-circle-exclamation mt-0.5 flex-shrink-0"></i>
+                        <span th:text="${error}">Erro de autenticação.</span>
+                    </div>
+
                     <!-- Botão de Submissão -->
                     <div class="form-control mt-4">
-                        <button type="submit" class="btn btn-primary bg-blue-700 hover:bg-blue-800 border-none text-white shadow-lg shadow-blue-100 btn-lg text-base">
+                        <button type="submit" id="btn-login" class="btn btn-primary bg-blue-700 hover:bg-blue-800 border-none text-white shadow-lg shadow-blue-100 btn-lg text-base">
                             Iniciar Sessão <i class="fa-solid fa-right-to-bracket ml-2"></i>
                         </button>
                     </div>
