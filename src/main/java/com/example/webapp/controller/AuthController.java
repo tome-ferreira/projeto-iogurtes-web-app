@@ -84,10 +84,10 @@ public class AuthController {
         try {
             LoginResponse resp = authService.login(email, password);
 
-            if (resp == null) {
-                // Credenciais inválidas (HTTP 4xx)
-                log.warn("Tentativa de login falhada para: {}", email);
-                model.addAttribute("error", "E-mail ou palavra-passe incorrectos. Por favor, tente novamente.");
+            if (resp == null || resp.role == null || !"CLIENTE".equalsIgnoreCase(resp.role)) {
+                // Credenciais inválidas (HTTP 4xx) ou acesso negado (role diferente de CLIENTE)
+                log.warn("Tentativa de login falhada ou acesso não autorizado para: {}", email);
+                model.addAttribute("error", "E-mail ou palavra-passe incorrectos ou não tem permissões para aceder a esta área.");
                 model.addAttribute("email", email);
                 return "login";
             }
