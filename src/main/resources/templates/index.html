@@ -3,19 +3,432 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bem-vindo | Aplicação</title>
+    <title>Norgurtes - Fábrica de Iogurtes de Viana do Castelo</title>
+    <!-- Tailwind CSS & daisyUI (Tema Cupcake/Light para um aspeto fresco e lácteo) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <!-- FontAwesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                }
+            },
+            daisyui: {
+                themes: ["light"], // Mantém um aspeto limpo e profissional
+            }
+        }
+    </script>
 </head>
-<body class="bg-base-200 min-h-screen">
-    <div class="hero min-h-screen">
-        <div class="hero-content text-center">
-            <div class="max-w-md">
-                <h1 class="text-5xl font-bold">Bem-vindo</h1>
-                <p class="py-6">A sua nova plataforma centralizada. Aceda à sua área de cliente para gerir todas as suas informações de forma simples e rápida.</p>
-                <a href="/login" class="btn btn-primary">Entrar na Conta</a>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+    <!-- BARRA DE NAVEGAÇÃO -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
+        <div class="navbar max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="navbar-start">
+                <div class="dropdown">
+                    <button tabindex="0" class="btn btn-ghost lg:hidden" aria-label="Menu">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
+                    </button>
+                    <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 text-slate-700">
+                        <li><a href="#sobre">A Fábrica</a></li>
+                        <li><a href="#parceiros">Canais de Venda</a></li>
+                        <li><a href="#catalogo">O Nosso Catálogo</a></li>
+                        <li><a href="#testemunhos">Testemunhos</a></li>
+                        <li><a href="#contactos">Contactos</a></li>
+                    </ul>
+                </div>
+                <!-- Logótipo Norgurtes -->
+                <a class="flex items-center gap-2 font-extrabold text-2xl text-blue-700 tracking-tight" href="#">
+                    <span>Norgurtes</span>
+                </a>
+            </div>
+            
+            <div class="navbar-center hidden lg:flex">
+                <ul class="menu menu-horizontal px-1 gap-2 font-semibold text-slate-600">
+                    <li><a href="#sobre" class="hover:text-blue-700 transition-colors">A Fábrica</a></li>
+                    <li><a href="#parceiros" class="hover:text-blue-700 transition-colors">Canais de Venda</a></li>
+                    <li><a href="#catalogo" class="hover:text-blue-700 transition-colors">O Nosso Catálogo</a></li>
+                    <li><a href="#testemunhos" class="hover:text-blue-700 transition-colors">Testemunhos</a></li>
+                    <li><a href="#contactos" class="hover:text-blue-700 transition-colors">Contactos</a></li>
+                </ul>
+            </div>
+            
+            <div class="navbar-end">
+                <!-- Botão de Login apontando para a página de login do Spring Boot -->
+                <a th:href="@{/login}" href="/login" class="btn btn-primary bg-blue-700 hover:bg-blue-800 border-none text-white shadow-md shadow-blue-200">
+                    <i class="fa-solid fa-user-tie mr-2"></i>Área de Cliente
+                </a>
             </div>
         </div>
-    </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="relative bg-gradient-to-br from-blue-50 via-white to-sky-50 py-20 lg:py-28 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-12 gap-12 items-center">
+                <!-- Conteúdo Textual -->
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 bg-blue-100/80 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold">
+                        <i class="fa-solid fa-location-dot"></i> Produzido em Viana do Castelo
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight">
+                        O iogurte fresco que valoriza o seu <span class="text-blue-700">negócio</span>.
+                    </h1>
+                    <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto lg:mx-0">
+                        Fornecemos iogurtes de alta qualidade, produzidos de forma tradicional com leite 100% português, diretamente para supermercados, restauração e revendedores.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+                        <a th:href="@{/login}" href="/login" class="btn btn-primary bg-blue-700 hover:bg-blue-800 text-white border-none btn-lg px-8">
+                            Aceder ao Catálogo <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </a>
+                        <a href="#contactos" class="btn btn-outline border-slate-300 hover:bg-slate-100 text-slate-700 btn-lg px-8">
+                            Falar com Comercial
+                        </a>
+                    </div>
+                    <!-- Mini Métricas B2B -->
+                    <div class="grid grid-cols-3 gap-6 pt-8 border-t border-slate-200/60 max-w-md mx-auto lg:mx-0">
+                        <div>
+                            <span class="block text-3xl font-extrabold text-blue-700">100%</span>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Leite Nacional</span>
+                        </div>
+                        <div>
+                            <span class="block text-3xl font-extrabold text-blue-700">+250</span>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Clientes Ativos</span>
+                        </div>
+                        <div>
+                            <span class="block text-3xl font-extrabold text-blue-700">24h</span>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Entrega Fria</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Imagem de Destaque Tridimensional e Moderna -->
+                <div class="lg:col-span-5 relative">
+                    <div class="absolute inset-0 bg-blue-400 rounded-3xl filter blur-3xl opacity-20 -rotate-6"></div>
+                    <div class="relative bg-white p-6 rounded-3xl shadow-xl border border-slate-100">
+                        <!-- Imagem Oficial de Teaser do Catálogo Gerada -->
+                        <img th:src="@{/images/catalogo-teaser.png}" src="/images/catalogo-teaser.png" alt="Amostra da nossa linha premium B2B de iogurtes Norgurtes" class="rounded-2xl w-100 object-cover shadow-inner" />
+                        <div class="mt-4 flex items-center justify-between">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- A FÁBRICA / SOBRE NÓS -->
+    <section id="sobre" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <span class="text-blue-700 font-bold uppercase tracking-wider text-sm block">Tradição & Qualidade</span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900">
+                        Nascida no coração de Viana do Castelo, focada no mercado grossista.
+                    </h2>
+                    <p class="text-lg text-slate-600">
+                        Na Norgurtes, acreditamos que a qualidade do produto final começa na origem do leite. Localizados estrategicamente em Viana do Castelo, recolhemos diariamente leite de produtores selecionados do Minho para fabricar iogurtes cremosos, nutritivos e com a textura perfeita.
+                    </p>
+                    <p class="text-lg text-slate-600">
+                        A nossa infraestrutura de produção de última geração permite-nos responder de forma ágil a grandes volumes de encomendas, garantindo rigorosos padrões de higiene e preservação da cadeia de frio até à entrega final.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 pt-4">
+                        <div class="flex items-start gap-3">
+                            <span class="text-emerald-500 mt-1"><i class="fa-solid fa-circle-check"></i></span>
+                            <div>
+                                <h4 class="font-bold text-slate-800">Certificação IFS Food</h4>
+                                <p class="text-sm text-slate-500">Padrões internacionais de segurança alimentar.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="text-emerald-500 mt-1"><i class="fa-solid fa-circle-check"></i></span>
+                            <div>
+                                <h4 class="font-bold text-slate-800">Logística Própria</h4>
+                                <p class="text-sm text-slate-500">Frota refrigerada dedicada a entregas rápidas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 flex flex-col justify-center items-center text-center space-y-6">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 text-2xl">
+                        <i class="fa-solid fa-industry"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900">Procura um fornecedor de confiança?</h3>
+                    <p class="text-slate-600 max-w-md">
+                        Quer necessite de marca própria, embalagens industriais para pastelaria ou formatos individuais para o seu supermercado, temos a solução certa.
+                    </p>
+                    <a href="#contactos" class="btn btn-primary bg-blue-700 hover:bg-blue-800 text-white border-none w-full max-w-xs">
+                        Agendar Visita Comercial
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO DE CLIENTES / CANAIS DE VENDA -->
+    <section id="parceiros" class="py-20 bg-slate-50 border-y border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <span class="text-blue-700 font-bold uppercase tracking-wider text-sm block">A Nossa Rede</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900">Soluções sob medida para o seu setor</h2>
+                <p class="text-lg text-slate-600">Desenvolvemos formatos e receitas específicas para garantir a máxima rentabilidade e satisfação dos seus clientes.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Supermercados -->
+                <div class="card bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-xl flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-shop"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900 mb-2">Supermercados</h3>
+                    <p class="text-sm text-slate-500">Formatos familiares, pacotes multipack e margens competitivas para linear de frio.</p>
+                </div>
+                <!-- Cafés e Pastelarias -->
+                <div class="card bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-mug-hot"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900 mb-2">Cafés & Pastelarias</h3>
+                    <p class="text-sm text-slate-500">Baldes industriais para recheios de pastelaria e iogurtes líquidos para menus de pequeno-almoço.</p>
+                </div>
+                <!-- Restaurantes e Hotéis -->
+                <div class="card bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-rose-100 text-rose-700 rounded-xl flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-utensils"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900 mb-2">Restauração & Horeca</h3>
+                    <p class="text-sm text-slate-500">Iogurte Grego e Natural em formatos gastronómicos ideais para molhos, sobremesas e pequeno-almoço buffet.</p>
+                </div>
+                <!-- Mercados Abastecedores -->
+                <div class="card bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-truck-ramp-box"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900 mb-2">Grossistas & Abastecedores</h3>
+                    <p class="text-sm text-slate-500">Paletização otimizada, estabilidade térmica e condições especiais de faturação para grandes volumes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TEASER DE PRODUTOS / CATÁLOGO PRIVADO -->
+    <section id="catalogo" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gradient-to-br from-blue-900 to-indigo-950 rounded-3xl text-white p-8 md:p-12 lg:p-16 relative overflow-hidden shadow-xl">
+                <!-- Efeito visual de fundo -->
+                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                
+                <div class="grid lg:grid-cols-12 gap-12 items-center relative z-10">
+                    <div class="lg:col-span-6 space-y-6">
+                        <span class="badge badge-lg bg-blue-500/20 text-blue-300 border-none font-semibold px-4">Área Restrita a Clientes</span>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Vasto catálogo de opções disponível online</h2>
+                        <p class="text-blue-100 text-lg">
+                            De forma a proteger a integridade comercial da nossa cadeia de distribuição e oferecer tabelas de preços personalizadas por volume, o nosso catálogo de produtos detalhado é de acesso exclusivo para parceiros registados.
+                        </p>
+                        
+                        <div class="pt-4">
+                            <a th:href="@{/login}" href="/login" class="btn btn-light bg-white hover:bg-slate-100 text-blue-900 border-none btn-lg">
+                                <i class="fa-solid fa-lock-open mr-2"></i>Entrar para ver Catálogo e Preços
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="lg:col-span-6">
+                        <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10 space-y-4">
+                            <!-- Visualização rápida desfocada para dar efeito de exclusividade -->
+                            <div class="relative rounded-xl overflow-hidden group">
+                                <img th:src="@{/images/catalogo.png}" src="/images/catalogo.png" alt="Amostra de iogurtes Norgurtes" class="w-full h-64 object-cover filter blur-[2px] transition duration-500" />
+                                <div class="absolute inset-0 bg-slate-900/60 flex flex-col items-center justify-center text-center p-4">
+                                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-xl mb-2 backdrop-blur-sm">
+                                        <i class="fa-solid fa-lock text-white"></i>
+                                    </div>
+                                    <span class="font-bold text-lg">Tabela de Preços e Encomendas Online</span>
+                                    <p class="text-xs text-slate-300 mt-1 max-w-xs">Inicie sessão com as credenciais enviadas pelo seu gestor comercial Norgurtes.</p>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTEMUNHOS -->
+    <section id="testemunhos" class="py-20 bg-slate-50 border-t border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <span class="text-blue-700 font-bold uppercase tracking-wider text-sm block">A Voz dos Nossos Clientes</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900">Quem trabalha connosco, recomenda</h2>
+                <p class="text-lg text-slate-600">Empresas locais e cadeias de retalho que confiam na pontualidade e consistência da Norgurtes.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Testemunho 1 -->
+                <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                    <p class="italic text-slate-600">
+                        "O iogurte grego natural da Norgurtes transformou o nosso menu de sobremesas. A cremosidade é inigualável e a consistência de entrega deles em Viana permite-nos trabalhar com stock sempre fresco."
+                    </p>
+                    <div class="mt-6 flex items-center gap-4 border-t border-slate-100 pt-4">
+                        <div class="w-10 h-10 bg-blue-100 text-blue-700 font-bold rounded-full flex items-center justify-center text-sm">
+                            RL
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm">Rui Lemos</h4>
+                            <p class="text-xs text-slate-500">Chef & Proprietário, Restaurante Âncora Verde</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Testemunho 2 -->
+                <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                    <p class="italic text-slate-600">
+                        "Fornecemos o linear de frio de todas as nossas 5 lojas no Minho com a gama líquida da Norgurtes. A rotação do produto é incrível e o feedback dos nossos clientes finais sobre o sabor tradicional é sempre positivo."
+                    </p>
+                    <div class="mt-6 flex items-center gap-4 border-t border-slate-100 pt-4">
+                        <div class="w-10 h-10 bg-indigo-100 text-indigo-700 font-bold rounded-full flex items-center justify-center text-sm">
+                            AM
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm">Albertina Meira</h4>
+                            <p class="text-xs text-slate-500">Diretora de Compras, MinhoSuper</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Testemunho 3 -->
+                <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                    <p class="italic text-slate-600">
+                        "Utilizamos os baldes industriais de iogurte natural para a nossa produção de pastelaria fina e pastelaria saudável. Excelente equilíbrio de acidez e estrutura estável de entrega garantida."
+                    </p>
+                    <div class="mt-6 flex items-center gap-4 border-t border-slate-100 pt-4">
+                        <div class="w-10 h-10 bg-amber-100 text-amber-700 font-bold rounded-full flex items-center justify-center text-sm">
+                            FS
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm">Fernando Sousa</h4>
+                            <p class="text-xs text-slate-500">Mestre Pasteleiro, Confeitaria Santa Luzia</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACTOS, FORMULÁRIO B2B & MAPA -->
+    <section id="contactos" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-12 gap-12 items-stretch">
+                <!-- Informações e Formulário -->
+                <div class="lg:col-span-6 space-y-8">
+                    <div class="space-y-4">
+                        <span class="text-blue-700 font-bold uppercase tracking-wider text-sm block">Contacte-nos</span>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900">Vamos fazer o seu negócio crescer</h2>
+                        <p class="text-lg text-slate-600">
+                            Preencha o formulário para receber a visita de um dos nossos delegados comerciais ou ligue diretamente para a nossa central de vendas.
+                        </p>
+                    </div>
+
+                    <div class="grid sm:grid-cols-2 gap-6 text-sm">
+                        <div class="flex gap-3">
+                            <span class="text-blue-700 text-xl mt-1"><i class="fa-solid fa-phone"></i></span>
+                            <div>
+                                <h4 class="font-bold text-slate-900">Central de Vendas</h4>
+                                <p class="text-slate-500">+351 258 102 304</p>
+                                <p class="text-xs text-slate-400">Chamada rede fixa nacional</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <span class="text-blue-700 text-xl mt-1"><i class="fa-solid fa-envelope"></i></span>
+                            <div>
+                                <h4 class="font-bold text-slate-900">E-mail Comercial</h4>
+                                <p class="text-slate-500">comercial@norgurtes.pt</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <span class="text-blue-700 text-xl mt-1"><i class="fa-solid fa-location-dot"></i></span>
+                            <div>
+                                <h4 class="font-bold text-slate-900">Fábrica & Sede</h4>
+                                <p class="text-slate-500">Zona Industrial de Neiva, Lote 14</p>
+                                <p class="text-slate-500">4900-012 Viana do Castelo</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <span class="text-blue-700 text-xl mt-1"><i class="fa-solid fa-clock"></i></span>
+                            <div>
+                                <h4 class="font-bold text-slate-900">Horário Expedição</h4>
+                                <p class="text-slate-500">Segunda a Sexta: 07:00 - 18:00</p>
+                                <p class="text-slate-500">Sábado: 08:00 - 13:00</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                </div>
+
+                <!-- Mapa Real de Viana do Castelo -->
+                <div class="lg:col-span-6 flex flex-col justify-between">
+                    <div class="w-full h-full min-h-[400px] rounded-3xl overflow-hidden shadow-md border border-slate-100 relative">
+                        <!-- Mapa Embebido do Google Maps focado em Viana do Castelo / Neiva para máxima verosimilhança -->
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d11916.142345678!2d-8.81881765432!3d41.6521943212!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd25b80a12e3f4af7%3A0x103ab6b4cb32ab41!2sZona%20Industrial%20de%20Neiva!5e0!3m2!1spt!2spt!4v1717600000000!5m2!1spt!2spt" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Localização da Fábrica Norgurtes em Viana do Castelo">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-4 gap-8">
+            <div class="space-y-4">
+                <a class="flex items-center gap-2 font-extrabold text-xl text-white tracking-tight" href="#">
+                    <span>Norgurtes</span>
+                </a>
+                <p class="text-sm">
+                    Fábrica de Iogurtes de Viana do Castelo dedicada ao setor profissional. Qualidade, proximidade e frescura diária.
+                </p>
+                <div class="flex gap-4 text-lg">
+                    <a href="#" class="hover:text-white transition-colors" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#" class="hover:text-white transition-colors" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="hover:text-white transition-colors" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                </div>
+            </div>
+            
+            
+
+            <div class="space-y-3">
+                <h4 class="font-bold text-white text-sm uppercase tracking-wider">Localização Física</h4>
+                <p class="text-sm">
+                    Zona Industrial de Neiva, Lote 14<br>
+                    4900-012 Viana do Castelo<br>
+                    Portugal
+                </p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-6 border-t border-slate-800 text-center text-xs text-slate-500 flex flex-col sm:flex-row justify-between gap-4">
+            <span>&copy; 2026 Norgurtes Lda. Todos os direitos reservados.</span>
+            <div class="flex gap-4 justify-center">
+                <a href="#" class="hover:text-white transition-colors">Política de Privacidade</a>
+                <a href="#" class="hover:text-white transition-colors">Termos e Condições</a>
+                <a href="#" class="hover:text-white transition-colors">Livro de Reclamações</a>
+            </div>
+        </div>
+    </footer>
+
 </body>
 </html>

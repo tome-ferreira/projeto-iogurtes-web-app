@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(title='Detalhe de Encomenda | Área B2B', activePage='encomendas', content=~{::#main-content})}">
+<body>
+    <div id="main-content">
+        <div class="space-y-6">
+
+            <!-- Breadcrumb / Link de Retorno -->
+            <div>
+                <a href="/encomendas"
+                   class="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors group">
+                    <i class="fa-solid fa-arrow-left text-xs group-hover:-translate-x-0.5 transition-transform"></i>
+                    Voltar às minhas encomendas
+                </a>
+            </div>
+
+            <div class="flex flex-col gap-6 items-start">
+                <div class="w-full space-y-6">
+                    <div class="bg-white border border-slate-100 rounded-2xl shadow-sm p-6">
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 border-b border-slate-100 mb-6">
+                            <div>
+                                <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Detalhe da Encomenda</h1>
+                                <span class="text-xs font-mono text-slate-400 mt-1 block" th:text="'Ref: ' + ${encomenda.id}">Ref</span>
+                            </div>
+                            <div class="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+                                <span th:with="label=${@enumDisplayHelper.getEstadoEncomendaLabel(encomenda.estado)}"
+                                      th:text="${label}"
+                                      th:classappend="${encomenda.estado == 'EXPEDIDA'} ? 'badge badge-success badge-outline' : (${encomenda.estado == 'CANCELADA'} ? 'badge badge-error badge-outline' : 'badge badge-warning badge-outline')"
+                                      class="badge badge-lg font-semibold shrink-0">—</span>
+                                
+                                <div th:if="${encomenda.estado == 'PENDENTE'}">
+                                    <button onclick="document.getElementById('cancel_modal').showModal()"
+                                            class="btn btn-error btn-sm text-white shadow-sm font-semibold hover:bg-red-600 border-none">
+                                        <i class="fa-solid fa-xmark mr-1"></i> Cancelar Encomenda
+                                    </button>
+
+                                    <!-- DaisyUI Modal para Confirmação -->
+                                    <dialog id="cancel_modal" class="modal modal-bottom sm:modal-middle">
+                                        <div class="modal-box bg-white shadow-xl">
+                                            <div class="flex items-center gap-4 mb-4">
+                                                <div class="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center shrink-0">
+                                                    <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
+                                                </div>
+                                                <h3 class="font-bold text-lg text-slate-900">Cancelar Encomenda</h3>
+                                            </div>
+                                            <p class="py-4 text-slate-600">Tem a certeza que pretende cancelar esta encomenda? Esta ação <strong>não pode ser revertida</strong>.</p>
+                                            <div class="modal-action flex items-center gap-2">
+                                                <form method="dialog" class="m-0 p-0">
+                                                    <button class="btn btn-ghost text-slate-600 hover:bg-slate-100">Voltar</button>
+                                                </form>
+                                                <form th:action="@{/encomenda/{id}/cancelar(id=${encomenda.id})}" method="post" class="m-0 p-0">
+                                                    <button type="submit" class="btn btn-error text-white shadow-sm font-semibold border-none hover:bg-red-600">
+                                                        <i class="fa-solid fa-check mr-1"></i> Confirmar
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <form method="dialog" class="modal-backdrop">
+                                            <button>Fechar</button>
+                                        </form>
+                                    </dialog>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Grelha de campos de detalhe -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5 text-sm">
+                            <div>
+                                <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs mb-1">Data de Encomenda</p>
+                                <p class="font-semibold text-slate-800" th:text="${encomenda.dataEncomenda != null ? #strings.substring(encomenda.dataEncomenda, 0, 10) : '—'}">—</p>
+                            </div>
+                            <div>
+                                <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs mb-1">Total (Moeda Original)</p>
+                                <p class="font-semibold text-slate-800" th:text="${encomenda.totalPreco != null ? #numbers.formatDecimal(encomenda.totalPreco, 1, 2) + ' ' + (encomenda.moedaSimbolo != null ? encomenda.moedaSimbolo : '') : '—'}">—</p>
+                            </div>
+                            <div>
+                                <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs mb-1">Total em EUR</p>
+                                <p class="font-bold text-slate-800 text-lg" th:text="${encomenda.totalPrecoEur != null ? #numbers.formatDecimal(encomenda.totalPrecoEur, 1, 2) + ' €' : '—'}">—</p>
+                            </div>
+                        </div>
+
+                        <!-- Tabela de Pallets -->
+                        <div th:if="${encomenda.pallets != null and !encomenda.pallets.isEmpty()}" class="mt-8 pt-6 border-t border-slate-100">
+                            <h3 class="font-bold text-slate-800 mb-4">Produtos Encomendados</h3>
+                            <div class="overflow-x-auto">
+                                <table class="table w-full">
+                                    <thead class="bg-slate-50/80 text-slate-500 font-semibold text-sm">
+                                        <tr>
+                                            <th>Produto</th>
+                                            <th>Tipo de Pallet</th>
+                                            <th class="text-center">Qtd. Pallets</th>
+                                            <th class="text-right">Preço / Pallet</th>
+                                            <th class="text-right">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="pallet : ${encomenda.pallets}" class="border-b border-slate-100 last:border-0">
+                                            <td>
+                                                <div class="flex flex-col">
+                                                    <span class="font-semibold text-slate-800" th:text="${pallet.produtoNome}">—</span>
+                                                    <span class="text-xs text-slate-400 font-mono mt-0.5" th:text="${pallet.produtoSku}">—</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span th:text="${pallet.palletTipoNome}">—</span>
+                                                <span class="text-xs text-slate-400 block" th:if="${pallet.palletCapacidadeKg != null}" th:text="${#numbers.formatDecimal(pallet.palletCapacidadeKg, 1, 0)} + ' kg'"></span>
+                                            </td>
+                                            <td class="text-center font-semibold" th:text="${pallet.quantidadePallets}">0</td>
+                                            <td class="text-right" th:text="${pallet.precoPorPalletEur != null ? #numbers.formatDecimal(pallet.precoPorPalletEur * (1 + (pallet.taxaIva != null ? pallet.taxaIva : 0.0) / 100.0), 1, 2) + ' €' : '—'}">—</td>
+                                            <td class="text-right font-semibold text-slate-800" th:text="${pallet.subtotalComIvaEur != null ? #numbers.formatDecimal(pallet.subtotalComIvaEur, 1, 2) + ' €' : '—'}">—</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

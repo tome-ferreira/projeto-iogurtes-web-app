@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(title='Encomendas | Área B2B', activePage='encomendas', content=~{::#main-content})}">
+<body>
+    <div id="main-content">
+        <div class="space-y-8">
+            <!-- Header Secção -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Histórico e Gestão de Encomendas</h1>
+                    <p class="text-slate-500 mt-1">Acompanhe o estado dos seus pedidos.</p>
+                </div>
+                <!-- Selector de tamanho de página -->
+                <form method="get" action="/encomendas" class="flex items-center gap-2">
+                    <label for="page-size-select" class="text-sm font-medium text-slate-500 whitespace-nowrap">Por página:</label>
+                    <select id="page-size-select" name="size"
+                            onchange="this.form.submit()"
+                            class="select select-bordered select-sm bg-white border-slate-200 text-slate-700 font-medium">
+                        <option th:each="opt : ${pageSizeOptions}"
+                                th:value="${opt}"
+                                th:text="${opt}"
+                                th:selected="${opt == pageSize}">10</option>
+                    </select>
+                    <!-- Manter page=0 ao mudar o tamanho -->
+                    <input type="hidden" name="page" value="0">
+                </form>
+            </div>
+
+            <!-- Cards de Métricas (daisyUI stats) -->
+            <div class="stats stats-vertical lg:stats-horizontal shadow-sm border border-slate-100 w-full bg-white rounded-2xl">
+                
+                <div class="stat">
+                    <div class="stat-figure text-slate-500 bg-slate-50 p-3 rounded-xl">
+                        <i class="fa-solid fa-clock-rotate-left fa-xl"></i>
+                    </div>
+                    <div class="stat-title font-semibold text-slate-500">Pendentes</div>
+                    <div class="stat-value text-slate-800 text-4xl" th:text="${totalPendentes}">0</div>
+                </div>
+                
+                <div class="stat">
+                    <div class="stat-figure text-blue-500 bg-blue-50 p-3 rounded-xl">
+                        <i class="fa-solid fa-truck-fast fa-xl"></i>
+                    </div>
+                    <div class="stat-title font-semibold text-slate-500">Expedidas</div>
+                    <div class="stat-value text-slate-800 text-4xl" th:text="${totalExpedidas}">0</div>
+                </div>
+                
+                <div class="stat">
+                    <div class="stat-figure text-red-500 bg-red-50 p-3 rounded-xl">
+                        <i class="fa-solid fa-xmark fa-xl"></i>
+                    </div>
+                    <div class="stat-title font-semibold text-slate-500">Canceladas</div>
+                    <div class="stat-value text-slate-800 text-4xl" th:text="${totalCanceladas}">0</div>
+                </div>
+                
+            </div>
+
+            <!-- Alerta de Erro -->
+            <div th:if="${errorMessage != null}"
+                 class="alert bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-start gap-3 p-4">
+                <i class="fa-solid fa-triangle-exclamation mt-0.5 flex-shrink-0"></i>
+                <div>
+                    <p class="font-bold">Erro</p>
+                    <p class="text-sm mt-0.5" th:text="${errorMessage}"></p>
+                </div>
+            </div>
+
+            <!-- Card Tabela de Encomendas -->
+            <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+                <!-- Toolbar da Tabela -->
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800">Todos os Pedidos</h3>
+                    <div class="text-sm text-slate-500 font-medium" th:text="${encomendas.totalElements} + ' resultado(s)'">0 resultado(s)</div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="table w-full">
+                        <!-- head -->
+                        <thead class="bg-slate-50/80 text-slate-500 font-semibold text-sm">
+                            <tr>
+                                <th class="uppercase tracking-wider">Data de Pedido</th>
+                                <th class="uppercase tracking-wider">Estado</th>
+                                <th class="uppercase tracking-wider text-right">Total</th>
+                                <th class="uppercase tracking-wider text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Estado Vazio -->
+                            <tr th:if="${encomendas.content == null or encomendas.content.isEmpty()}">
+                                <td colspan="4" class="py-20 text-center">
+                                    <div class="flex flex-col items-center justify-center text-slate-400">
+                                        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                                            <i class="fa-solid fa-box-open fa-2x text-slate-300"></i>
+                                        </div>
+                                        <p class="font-bold text-slate-600 text-lg">Ainda não efetuou nenhuma encomenda.</p>
+                                        <a th:href="@{/catalogo}" class="btn btn-primary bg-blue-700 hover:bg-blue-800 text-white border-none mt-6 shadow-md">
+                                            Criar Primeira Encomenda
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Linhas de Encomendas -->
+                            <tr th:each="encomenda : ${encomendas.content}" class="hover:bg-slate-50/60 transition-colors border-b border-slate-100 last:border-0">
+                                <td>
+                                    <span class="font-semibold text-slate-800" th:text="${#strings.substring(encomenda.dataEncomenda, 0, 10)}">—</span>
+                                </td>
+                                <td>
+                                    <span th:with="label=${@enumDisplayHelper.getEstadoEncomendaLabel(encomenda.estado)}"
+                                          th:text="${label}"
+                                          th:classappend="${encomenda.estado == 'EXPEDIDA'} ? 'badge badge-success badge-outline' : (${encomenda.estado == 'CANCELADA'} ? 'badge badge-error badge-outline' : 'badge badge-warning badge-outline')"
+                                          class="badge font-medium">—</span>
+                                </td>
+                                <td class="text-right">
+                                    <span class="font-bold text-slate-800"
+                                          th:text="${encomenda.totalPrecoEur != null ? #numbers.formatDecimal(encomenda.totalPrecoEur, 1, 2) + ' €' : '—'}">—</span>
+                                </td>
+                                <td class="text-center">
+                                    <a th:href="@{/encomendas/{id}(id=${encomenda.id})}"
+                                       class="btn btn-sm bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 hover:border-blue-200 font-semibold shadow-none">
+                                        <i class="fa-solid fa-eye mr-1"></i> Detalhes
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Paginação -->
+            <div th:if="${encomendas.totalPages > 0}"
+                 class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                <p class="text-sm text-slate-500 font-medium">
+                    Página <span class="font-bold text-slate-700" th:text="${currentPage + 1}">1</span>
+                    de <span class="font-bold text-slate-700" th:text="${encomendas.totalPages}">1</span>
+                    &nbsp;·&nbsp;
+                    <span th:text="${encomendas.totalElements}">0</span> encomenda(s) no total
+                </p>
+                <div class="join shadow-sm">
+                    <a th:if="${!encomendas.first}" th:href="@{/encomendas(page=${currentPage - 1}, size=${pageSize})}"
+                       class="join-item btn btn-sm bg-white border border-slate-300 text-slate-800 hover:bg-slate-100 font-bold shadow-sm">
+                        <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+                    </a>
+                    <span th:if="${encomendas.first}" class="join-item btn btn-sm bg-slate-50 border border-slate-200 text-slate-400 font-semibold pointer-events-none">
+                        <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+                    </span>
+
+                    <a th:if="${!encomendas.last}" th:href="@{/encomendas(page=${currentPage + 1}, size=${pageSize})}"
+                       class="join-item btn btn-sm bg-white border border-slate-300 text-slate-800 hover:bg-slate-100 font-bold shadow-sm">
+                        Próxima <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </a>
+                    <span th:if="${encomendas.last}" class="join-item btn btn-sm bg-slate-50 border border-slate-200 text-slate-400 font-semibold pointer-events-none">
+                        Próxima <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

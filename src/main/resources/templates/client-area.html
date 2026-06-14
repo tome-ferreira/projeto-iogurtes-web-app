@@ -1,51 +1,74 @@
 <!DOCTYPE html>
-<html lang="pt" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Área de Cliente | Aplicação</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
-</head>
-<body class="bg-base-100 min-h-screen">
-    <!-- Navbar -->
-    <div class="navbar bg-primary text-primary-content">
-        <div class="flex-1">
-            <a href="/client-area" class="btn btn-ghost text-xl">Meu Dashboard</a>
-        </div>
-        <div class="flex-none">
-            <ul class="menu menu-horizontal px-1">
-                <li><a href="#">Perfil</a></li>
-                <li><a href="#">Definições</a></li>
-                <li>
-                    <a href="/" class="btn btn-error btn-sm ml-2 mt-1 border-none hover:bg-error/80">Sair</a>
-                </li>
-            </ul>
-        </div>
-    </div>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(title='Dashboard | Área B2B', activePage='dashboard', content=~{::#main-content})}">
+<body>
+    <div id="main-content">
+        <div class="space-y-8">
+            <!-- Header Section / Boas-vindas -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight" th:text="'Olá, ' + ${userName}">Olá, Parceiro Norgurtes</h1>
+                    
+                </div>
+                
+            </div>
 
-    <!-- Main Content -->
-    <div class="container mx-auto p-8">
-        <h1 class="text-3xl font-bold mb-6">Bem-vindo à Área de Cliente</h1>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="card bg-base-200 shadow-sm">
-                <div class="card-body">
-                    <h2 class="card-title">Estatísticas</h2>
-                    <p>Aqui você pode ver o resumo das suas atividades.</p>
+            <!-- Cards de Métricas (daisyUI stats) -->
+            <div class="stats stats-vertical lg:stats-horizontal shadow-sm border border-slate-100 w-full bg-white rounded-2xl">
+                
+                <div class="stat">
+                    <div class="stat-figure text-slate-500 bg-slate-50 p-3 rounded-xl">
+                        <i class="fa-solid fa-clock-rotate-left fa-xl"></i>
+                    </div>
+                    <div class="stat-title font-semibold text-slate-500">Pendentes</div>
+                    <div class="stat-value text-slate-800 text-4xl" th:text="${totalPendentes}">0</div>
+                </div>
+                
+                <div class="stat">
+                    <div class="stat-figure text-blue-500 bg-blue-50 p-3 rounded-xl">
+                        <i class="fa-solid fa-truck-fast fa-xl"></i>
+                    </div>
+                    <div class="stat-title font-semibold text-slate-500">Expedidas</div>
+                    <div class="stat-value text-slate-800 text-4xl" th:text="${totalExpedidas}">0</div>
+                </div>
+                
+                <div class="stat">
+                    <div class="stat-figure text-red-500 bg-red-50 p-3 rounded-xl">
+                        <i class="fa-solid fa-xmark fa-xl"></i>
+                    </div>
+                    <div class="stat-title font-semibold text-slate-500">Canceladas</div>
+                    <div class="stat-value text-slate-800 text-4xl" th:text="${totalCanceladas}">0</div>
+                </div>
+                
+            </div>
+            <!-- Produtos Recentes -->
+            <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden mt-8">
+                <!-- Toolbar -->
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800 text-lg">Produtos Recentes</h3>
+                    <a th:href="@{/catalogo}" class="btn btn-sm btn-primary bg-blue-700 hover:bg-blue-800 text-white border-none shadow-sm">
+                        Todos os produtos
+                    </a>
+                </div>
+
+                <div class="p-0">
+                    <!-- Estado vazio -->
+                    <div th:if="${produtosRecentes == null or produtosRecentes.isEmpty()}" class="py-12 text-center">
+                        <p class="text-slate-600 font-medium">Ainda não realizou nenhuma encomenda.</p>
+                        <a th:href="@{/catalogo}" class="text-blue-600 font-semibold hover:underline mt-2 inline-block">Explorar catálogo</a>
+                    </div>
+
+                    <!-- Lista de Produtos -->
+                    <div th:if="${produtosRecentes != null and !produtosRecentes.isEmpty()}" class="flex flex-col">
+                        <div th:each="produto : ${produtosRecentes}" class="flex items-center justify-between p-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors">
+                            <span class="font-semibold text-slate-800" th:text="${produto.nome}">Nome do Produto</span>
+                            <a th:href="@{/produto/{id}(id=${produto.id})}" class="text-blue-600 hover:text-blue-800 font-semibold text-sm flex items-center gap-1">
+                                Ver detalhes <i class="fa-solid fa-chevron-right text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="card bg-base-200 shadow-sm">
-                <div class="card-body">
-                    <h2 class="card-title">Mensagens</h2>
-                    <p>Você tem 0 novas mensagens.</p>
-                </div>
-            </div>
-            <div class="card bg-base-200 shadow-sm">
-                <div class="card-body">
-                    <h2 class="card-title">Documentos</h2>
-                    <p>Aceda aos seus ficheiros e faturas recentes.</p>
-                </div>
-            </div>
+
         </div>
     </div>
 </body>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(title='Catálogo | Área B2B', activePage='catalogo', content=~{::#main-content})}">
+<body>
+    <div id="main-content">
+        <div class="space-y-8">
+
+            <!-- ══ CABEÇALHO DA SECÇÃO ══════════════════════════════════════ -->
+            <div class="border-b border-slate-200 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Catálogo Exclusivo de Produtos</h1>
+                    <p class="text-slate-500 mt-1">Consulte os nossos iogurtes, formatos industriais e tabelas de preços B2B.</p>
+                </div>
+                <!-- Selector de tamanho de página -->
+                <form method="get" action="/catalogo" class="flex items-center gap-2">
+                    <label for="page-size-select" class="text-sm font-medium text-slate-500 whitespace-nowrap">Por página:</label>
+                    <select id="page-size-select" name="size"
+                            onchange="this.form.submit()"
+                            class="select select-bordered select-sm bg-white border-slate-200 text-slate-700 font-medium">
+                        <option th:each="opt : ${pageSizeOptions}"
+                                th:value="${opt}"
+                                th:text="${opt}"
+                                th:selected="${opt == pageSize}">10</option>
+                    </select>
+                    <!-- Manter page=0 ao mudar o tamanho -->
+                    <input type="hidden" name="page" value="0">
+                </form>
+            </div>
+
+            <!-- ══ ALERTA DE ERRO DE API ════════════════════════════════════ -->
+            <div th:if="${errorMessage != null}"
+                 class="alert bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-start gap-3 p-4">
+                <i class="fa-solid fa-triangle-exclamation mt-0.5 flex-shrink-0"></i>
+                <div>
+                    <p class="font-bold">Erro ao carregar dados</p>
+                    <p class="text-sm mt-0.5" th:text="${errorMessage}"></p>
+                </div>
+            </div>
+
+            <!-- ══ TABELA DE PRODUTOS ════════════════════════════════════════ -->
+            <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+
+                <!-- Toolbar -->
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800">Produtos Disponíveis</h3>
+                    <div class="text-sm text-slate-500 font-medium"
+                         th:text="${produtos.totalElements} + ' resultado(s)'">0 resultado(s)</div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="table w-full">
+                        <!-- Cabeçalho -->
+                        <thead class="bg-slate-50/80 text-slate-500 font-semibold text-sm">
+                            <tr>
+                                <th class="uppercase tracking-wider">Nome do Produto</th>
+                                <th class="uppercase tracking-wider">Estado Físico</th>
+                                <th class="uppercase tracking-wider text-right">Preço / kg</th>
+                                <th class="uppercase tracking-wider text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <!-- ── Estado vazio ── -->
+                            <tr th:if="${produtos.content == null or produtos.content.isEmpty()}">
+                                <td colspan="4" class="py-20 text-center">
+                                    <div class="flex flex-col items-center justify-center text-slate-400">
+                                        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                                            <i class="fa-solid fa-box-open fa-2x text-slate-300"></i>
+                                        </div>
+                                        <p class="font-bold text-slate-600 text-lg">Nenhum produto disponível.</p>
+                                        <p class="text-sm mt-2 max-w-sm text-slate-400">
+                                            O catálogo de produtos B2B estará disponível em breve.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ── Linhas de produto ── -->
+                            <tr th:each="produto : ${produtos.content}"
+                                class="hover:bg-slate-50/60 transition-colors border-b border-slate-100 last:border-0">
+
+                                <!-- Nome + SKU -->
+                                <td>
+                                    <div class="flex flex-col">
+                                        <span class="font-semibold text-slate-800" th:text="${produto.nome}">—</span>
+                                        <span class="text-xs text-slate-400 font-mono mt-0.5" th:text="${produto.codigoSku}">—</span>
+                                    </div>
+                                </td>
+
+                                <!-- Estado Físico com badge colorido -->
+                                <td>
+                                    <span th:with="label=${@enumDisplayHelper.getEstadoFisicoLabel(produto.estadoFisico)}"
+                                          th:text="${label}"
+                                          th:classappend="${produto.estadoFisico == 'LIQUIDO'} ? 'badge badge-info badge-outline' : 'badge badge-warning badge-outline'"
+                                          class="badge font-medium">—</span>
+                                </td>
+
+                                <!-- Preço por kg -->
+                                <td class="text-right">
+                                    <span class="font-bold text-slate-800"
+                                          th:text="${produto.precoPorKg != null ? #numbers.formatDecimal(produto.precoPorKg, 1, 2) + ' €' : '—'}">—</span>
+                                </td>
+
+                                <!-- Link para página de detalhe -->
+                                <td class="text-center">
+                                    <a th:href="@{/produto/{id}(id=${produto.id})}"
+                                       class="btn btn-sm bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 hover:border-blue-200 font-semibold shadow-none">
+                                        <i class="fa-solid fa-eye mr-1"></i> Detalhes
+                                    </a>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ══ PAGINAÇÃO ═════════════════════════════════════════════════ -->
+            <div th:if="${produtos.totalPages > 0}"
+                 class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+
+                <!-- Indicador de página -->
+                <p class="text-sm text-slate-500 font-medium">
+                    Página <span class="font-bold text-slate-700"
+                                 th:text="${currentPage + 1}">1</span>
+                    de <span class="font-bold text-slate-700"
+                              th:text="${produtos.totalPages}">1</span>
+                    &nbsp;·&nbsp;
+                    <span th:text="${produtos.totalElements}">0</span> produto(s) no total
+                </p>
+
+                <!-- Botões de navegação -->
+                <div class="join shadow-sm">
+                    <!-- Anterior -->
+                    <a th:if="${!produtos.first}"
+                       th:href="@{/catalogo(page=${currentPage - 1}, size=${pageSize})}"
+                       class="join-item btn btn-sm bg-white border border-slate-300 text-slate-800 hover:bg-slate-100 font-bold shadow-sm">
+                        <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+                    </a>
+                    <span th:if="${produtos.first}"
+                          class="join-item btn btn-sm bg-slate-50 border border-slate-200 text-slate-400 font-semibold pointer-events-none">
+                        <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+                    </span>
+
+                    <!-- Próxima -->
+                    <a th:if="${!produtos.last}"
+                       th:href="@{/catalogo(page=${currentPage + 1}, size=${pageSize})}"
+                       class="join-item btn btn-sm bg-white border border-slate-300 text-slate-800 hover:bg-slate-100 font-bold shadow-sm">
+                        Próxima <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </a>
+                    <span th:if="${produtos.last}"
+                          class="join-item btn btn-sm bg-slate-50 border border-slate-200 text-slate-400 font-semibold pointer-events-none">
+                        Próxima <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
