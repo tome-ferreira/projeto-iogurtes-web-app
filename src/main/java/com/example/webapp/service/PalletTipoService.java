@@ -11,36 +11,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 
-/**
- * Serviço de aplicação que encapsula as chamadas HTTP ao endpoint de tipos de pallet
- * ({@code GET /pallet-tipos}).
- *
- * <p>Utiliza {@link ApiQuery} para executar os pedidos Retrofit de forma
- * síncrona e encapsula erros de rede ou HTTP com mensagens legíveis.</p>
- */
 @Service
 public class PalletTipoService {
 
     private static final Logger log = LoggerFactory.getLogger(PalletTipoService.class);
 
-    private final IPalletTipoApiService api =
-            RetrofitClient.getInstance().getService(IPalletTipoApiService.class);
+    private final IPalletTipoApiService api = RetrofitClient.getInstance().getService(IPalletTipoApiService.class);
 
-    /**
-     * Devolve todos os tipos de pallet activos (paginação generosa para obter tudo).
-     *
-     * @param page      índice da página (0-based)
-     * @param size      número de itens por página
-     * @param sort      campo de ordenação (ex.: "nome")
-     * @param direction direcção de ordenação ("asc" ou "desc")
-     * @return página de tipos de pallet, ou uma resposta vazia em caso de erro
-     * @throws PalletTipoException se ocorrer um erro ao aceder à API
-     */
     public PaginatedResponse<PalletTipoResponse> getAll(int page, int size,
-                                                        String sort, String direction) {
+            String sort, String direction) {
         @SuppressWarnings("unchecked")
         final PaginatedResponse<PalletTipoResponse>[] result = new PaginatedResponse[1];
-        final String[] errorMessage = {null};
+        final String[] errorMessage = { null };
 
         ApiQuery.execute(api.findAll(page, size, sort, direction), state -> {
             if (state.isSuccess()) {
@@ -59,22 +41,12 @@ public class PalletTipoService {
         return result[0];
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // Excepção específica deste serviço
-    // ──────────────────────────────────────────────────────────────────────────
-
-    /**
-     * Excepção lançada quando o pedido ao endpoint de tipos de pallet falha.
-     */
     public static class PalletTipoException extends RuntimeException {
         public PalletTipoException(String message) {
             super(message);
         }
     }
 
-    /**
-     * Cria uma {@link PaginatedResponse} vazia, para uso em estados de erro no controller.
-     */
     public static PaginatedResponse<PalletTipoResponse> emptyResponse() {
         PaginatedResponse<PalletTipoResponse> empty = new PaginatedResponse<>();
         empty.content = Collections.emptyList();

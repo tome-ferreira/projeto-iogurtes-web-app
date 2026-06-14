@@ -1,8 +1,5 @@
 package com.example.webapp.model.encomenda;
 
-/**
- * Representa um item de pallet numa encomenda.
- */
 public class EncomendaPalletItem {
 
     public String produtoId;

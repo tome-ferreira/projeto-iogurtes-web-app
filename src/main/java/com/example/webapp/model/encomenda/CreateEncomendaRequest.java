@@ -2,10 +2,6 @@ package com.example.webapp.model.encomenda;
 
 import java.util.List;
 
-/**
- * Representa o payload para criar uma encomenda via API.
- * Endpoint: POST /encomendas
- */
 public class CreateEncomendaRequest {
 
     public String userId;

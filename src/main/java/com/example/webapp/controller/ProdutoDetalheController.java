@@ -23,19 +23,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Controller Spring MVC para a página de detalhe de produto e gestão do carrinho.
- *
- * <h3>Rotas</h3>
- * <ul>
- *   <li>{@code GET  /produto/{id}} — mostra o detalhe completo de um produto</li>
- *   <li>{@code POST /produto/{id}/adicionar-carrinho} — adiciona ao carrinho (PRG)</li>
- * </ul>
- *
- * <h3>PRG (Post-Redirect-Get)</h3>
- * <p>O POST de adição ao carrinho redirige sempre para {@code GET /produto/{id}}
- * para evitar resubmissões ao recarregar a página.</p>
- */
 @Controller
 public class ProdutoDetalheController {
 
@@ -50,30 +37,13 @@ public class ProdutoDetalheController {
     @Autowired
     private CarrinhoService carrinhoService;
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // GET /produto/{id}
-    // ──────────────────────────────────────────────────────────────────────────
-
-    /**
-     * Renderiza a página de detalhe de um produto final.
-     *
-     * <p>Carrega o produto via {@code GET /produtos-finais/{id}} e os tipos de
-     * pallet disponíveis via {@code GET /pallet-tipos}. Em caso de erro, redirige
-     * para o catálogo com uma mensagem de aviso.</p>
-     *
-     * @param id      UUID do produto (path variable)
-     * @param session sessão HTTP corrente
-     * @param model   modelo Thymeleaf
-     * @return nome do template {@code "produto-detalhe"} ou redirect para {@code /catalogo}
-     */
     @GetMapping("/produto/{id}")
     public String detalhe(
             @PathVariable String id,
             HttpSession session,
             Model model,
-            RedirectAttributes redirectAttributes
-    ) {
-        // ── 1. Buscar produto por id ───────────────────────────────────────────
+            RedirectAttributes redirectAttributes) {
+        // Buscar produto por id
         ProdutoCatalogoResponse produto;
         try {
             produto = produtoCatalogoService.getById(id);
@@ -91,11 +61,10 @@ public class ProdutoDetalheController {
             return "redirect:/catalogo";
         }
 
-        // ── 2. Buscar tipos de pallet ──────────────────────────────────────────
+        // Buscar tipos de pallet
         List<PalletTipoResponse> palletTipos;
         try {
-            PaginatedResponse<PalletTipoResponse> paginatedPallets =
-                    palletTipoService.getAll(0, 200, "nome", "asc");
+            PaginatedResponse<PalletTipoResponse> paginatedPallets = palletTipoService.getAll(0, 200, "nome", "asc");
             palletTipos = paginatedPallets.content != null
                     ? paginatedPallets.content
                     : List.of();
@@ -104,20 +73,16 @@ public class ProdutoDetalheController {
             palletTipos = List.of();
         }
 
-        // ── 3. Carrinho (para badge na navbar e eventual uso no template) ──────
+        // Carrinho
         Carrinho carrinho = carrinhoService.getCarrinho(session);
 
-        // ── 4. Popular modelo ─────────────────────────────────────────────────
-        model.addAttribute("produto",      produto);
-        model.addAttribute("palletTipos",  palletTipos);
-        model.addAttribute("carrinho",     carrinho);
+        // Popular modelo
+        model.addAttribute("produto", produto);
+        model.addAttribute("palletTipos", palletTipos);
+        model.addAttribute("carrinho", carrinho);
 
         return "produto-detalhe";
     }
-
-    // ──────────────────────────────────────────────────────────────────────────
-    // POST /produto/{id}/adicionar-carrinho
-    // ──────────────────────────────────────────────────────────────────────────
 
     @PostMapping("/produto/{id}/adicionar-carrinho")
     public String adicionarAoCarrinho(
@@ -127,9 +92,8 @@ public class ProdutoDetalheController {
             @RequestParam int quantidadePallets,
             @RequestParam String produtoNome,
             HttpSession session,
-            RedirectAttributes redirectAttributes
-    ) {
-        // 1. Buscar produto para garantir que existe e obter o preço base (por kg)
+            RedirectAttributes redirectAttributes) {
+        // Buscar produto para garantir que existe e obter o preço base (por kg)
         ProdutoCatalogoResponse produto;
         try {
             produto = produtoCatalogoService.getById(id);
@@ -139,11 +103,10 @@ public class ProdutoDetalheController {
             return "redirect:/catalogo";
         }
 
-        // 2. Buscar capacidade da pallet
+        // Buscar capacidade da pallet
         double capacidadePalletKg = 1.0; // fallback se não encontrar
         try {
-            PaginatedResponse<PalletTipoResponse> paginatedPallets =
-                    palletTipoService.getAll(0, 200, "nome", "asc");
+            PaginatedResponse<PalletTipoResponse> paginatedPallets = palletTipoService.getAll(0, 200, "nome", "asc");
             if (paginatedPallets.content != null) {
                 for (PalletTipoResponse pt : paginatedPallets.content) {
                     if (pt.id != null && pt.id.equals(palletTipoId.toString())) {
@@ -158,11 +121,11 @@ public class ProdutoDetalheController {
             log.warn("Falha ao obter capacidade da pallet, usará fallback de 1kg", e);
         }
 
-        // 3. Calcular preço total da linha com IVA
+        // Calcular preço total da linha com IVA
         // Preço Unitário = (preço por Kg * capacidade da pallet) * (1 + taxaIVA/100)
         double precoBase = produto.precoPorKg != null ? produto.precoPorKg.doubleValue() : 0.0;
         double taxaIva = produto.taxaIva != null ? produto.taxaIva.doubleValue() : 0.0;
-        
+
         double precoUnitarioBase = precoBase * capacidadePalletKg;
         double precoUnitario = precoUnitarioBase * (1.0 + (taxaIva / 100.0));
         double precoTotal = precoUnitario * quantidadePallets;
@@ -174,8 +137,7 @@ public class ProdutoDetalheController {
                 palletTipoNome,
                 quantidadePallets,
                 precoUnitario,
-                precoTotal
-        );
+                precoTotal);
         carrinhoService.adicionarItem(session, item);
         log.info("Item adicionado ao carrinho: produto={}, pallet={}, qty={}, precoUnitario={}, precoTotal={}",
                 produtoNome, palletTipoNome, quantidadePallets, precoUnitario, precoTotal);

@@ -23,6 +23,6 @@ public class SessionUser {
     public String getRole()  { return role; }
     public String getToken() { return token; }
 
-    // Setter (token é definido após o login, separadamente)
+    // Setter 
     public void setToken(String token) { this.token = token; }
 }
